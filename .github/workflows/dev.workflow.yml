@@ -27,7 +27,7 @@ jobs:
         registry: ${{ secrets.ACR_HOST }}
         username: ${{ secrets.REGISTRY_USERNAME }}
         password: ${{ secrets.REGISTRY_PASSWORD }}
-        tags: ${{env.DOCKER_TAG}
+        tags: ${{env.DOCKER_TAG}}
         
     - name: Deploy to App Service
       uses: azure/webapps-deploy@v2
