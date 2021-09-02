@@ -9,29 +9,35 @@ env:
   APP_SERVICE_NAME: wap-validation-services-dev
   DOCKER_IMAGE: get-rfc
   DOCKER_TAG: "1.0.0"
+ 
       
 jobs:
-  build-and-deploy:
+  build-and-deploy-dev:
+    environment: dev
     runs-on: ubuntu-latest
-    
     steps:
-    
     - name: Checkout GitHub Actions
       uses: actions/checkout@main
-     
+      with:
+        ref: 'dev'
     - name: Build and push container image to registry 
       id: container-registry
       uses: mr-smithers-excellent/docker-build-push@v5.5
       with: 
-        image: ${{env.DOCKER_IMAGE}}
-        registry: ${{ secrets.ACR_HOST }}
-        username: ${{ secrets.REGISTRY_USERNAME }}
-        password: ${{ secrets.REGISTRY_PASSWORD }}
-        tags: ${{env.DOCKER_TAG}}
-        
+        image: ${​{​env.DOCKER_IMAGE}​}​
+        registry: ${​{​secrets.ACR_HOST }​}​
+        username: ${​{​ secrets.REGISTRY_USERNAME }​}​
+        password: ${​{​ secrets.REGISTRY_PASSWORD }​}​
+        tags: ${​{​env.DOCKER_TAG}​}​
     - name: Deploy to App Service
       uses: azure/webapps-deploy@v2
       with:
-        app-name: ${{env.APP_SERVICE_NAME}}
-        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-        images: ${{secrets.ACR_HOST }}/${{env.DOCKER_IMAGE}}:${{ env.DOCKER_TAG }}
+        app-name: ${​{​env.APP_SERVICE_NAME}​}​
+        publish-profile: ${​{​ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }​}​
+        images: ${​{​secrets.ACR_HOST }​}​/${​{​env.DOCKER_IMAGE}​}​:${​{​ env.DOCKER_TAG }​}​
+    
+    
+  
+  
+
+
