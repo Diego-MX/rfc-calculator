@@ -1,0 +1,147 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "Esta API se encarga de calcular el RFC para una persona física.",
+    "version": "0.0.1",
+    "title": "Get RFC-id."
+  },
+  "host": "get-rfc-id.azurewebsites.net",
+  "basePath": "/api",
+  "schemes": ["https"],
+  "paths": {
+    "/v1/utilities/": {
+      "post": {
+        "tags": ["user-rfc"],
+        "operationId": "get-rfc-id",
+        "summary": "",
+        "description": "",
+        "consumes": ["application/json"],
+        "parameters": [
+          {
+            "type": "string",
+            "in": "header",
+            "name": "Authorization",
+            "description": "Bearer token generado en el proceso de autenticación",
+            "required": true
+          },
+          {
+            "type": "string",
+            "in": "header",
+            "name": "subscription-key",
+            "description": "Llave API del cliente consumidor",
+            "required": true
+          },
+          {
+            "type": "string",
+            "in": "header",
+            "name": "uuid",
+            "description": "Identificador único de la petición",
+            "required": true
+          },
+          {
+            "in": "body",
+            "name": "personPhysical",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/PersonPhysical"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema":{
+              "$ref": "#/definitions/ApplicationRFCResponse"
+            }
+          },
+          "400": {
+            "description": "Invalid Input",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "500": {
+            "description": "Internal Engine Error",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "PersonPhysical": {
+      "type": "object",
+      "properties": {
+        "firstName": {
+          "type": "string"
+        },
+        "lastName": {
+          "type": "string"
+        }, 
+        "maternalLastName" : {
+          "type": "string"
+        },
+        "dateOfBirth": {
+          "type": "string", 
+          "description": "Date of Birth in format: ",
+          "format": "Date"
+        }
+      }, 
+      "required": [
+        "firstName",
+        "lastName",
+        "maternalLastName",
+        "dateOfBirth"
+      ] 
+    },
+    "RFCResponse": {
+      "type": "object",
+      "properties": {
+        "rfc": {
+          "type": "string", 
+          "description": "The RFC id for a given person."
+        }
+      } 
+    },
+    "ErrorResponse": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string",
+          "description": "Código de error",
+          "example": "0056"
+        },
+        "type": {
+          "type": "string",
+          "description": "Tipo de error que se recibe",
+          "example": "security/access-denied"
+        },
+        "status": {
+          "type": "string",
+          "description": "Status http que responde el servicio",
+          "example": "500"
+        },
+        "detail": {
+          "type": "string",
+          "description": "Información detallada del error",
+          "example": "Se detecto un ingreso no autorizado"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Fecha y hora de la respuesta de error",
+          "example": "2017-07-21T17:32:28Z"
+        },
+        "instance": {
+          "type": "string",
+          "description": "Permite identificar el lugar especifico donde se originó el error",
+          "example": "login/oauth-server"
+        }
+      }
+    }
+  }
+}
+
+

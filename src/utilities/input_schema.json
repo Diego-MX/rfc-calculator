@@ -1,0 +1,18 @@
+{
+    "type": "object",
+    "properties": {
+        "personPhysical": {
+            "type": "object",
+            "properties": {
+                "firstName"         : { "type": "string" },
+                "lastName"          : { "type": "string" },
+                "maternalLastName"  : { "type": "string" },
+                "dateOfBirth"       : { "type": "string" }
+            },   
+            "required": [
+                "firstName", "lastName", "maternalLastName", "dateOfBirth"
+            ]
+        }
+    }, 
+    "required"  : ["personPhysical"]
+}
