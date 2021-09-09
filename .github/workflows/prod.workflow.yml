@@ -6,7 +6,7 @@ on:
       - main
 
 env:
-  APP_SERVICE_NAME: wap-validation-services-dev
+  APP_SERVICE_NAME: wap-validation-services-prod
   DOCKER_IMAGE: get-rfc
   DOCKER_TAG: "1.0.0"
       
@@ -27,7 +27,7 @@ jobs:
         registry: ${{secrets.ACR_HOST }}
         username: ${{ secrets.REGISTRY_USERNAME }}
         password: ${{ secrets.REGISTRY_PASSWORD }}
-        tags: ${{env.DOCKER_TAG}Ñ
+        tags: ${{env.DOCKER_TAG}}
         
     - name: Deploy to App Service
       uses: azure/webapps-deploy@v2

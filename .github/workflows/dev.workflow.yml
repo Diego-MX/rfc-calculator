@@ -7,7 +7,7 @@ on:
 
 env:
   APP_SERVICE_NAME: wap-validation-services-dev
-  DOCKER_IMAGE: get-rfc
+  DOCKER_IMAGE: get-rfc-dev
   DOCKER_TAG: "1.0.0"
       
 jobs:
