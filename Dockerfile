@@ -8,7 +8,7 @@ WORKDIR /code
  
 # copy the dependencies file to the working directory
 COPY requirements.txt .
-ADD dockerfile .
+ADD Dockerfile .
  
 # install dependencies
 RUN pip install -r requirements.txt
