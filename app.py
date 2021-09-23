@@ -35,7 +35,7 @@ def get_rfc():
     a_person = an_input.get("personPhysical")
     try: 
         campos_ls  = ["lastName", "maternalLastName", "firstName"]
-        nombres_ls = itemgetter(campos_ls)(a_person)
+        nombres_ls = itemgetter(*campos_ls)(a_person)
         f_inicio   = dt.strptime(a_person.get("dateOfBirth"), "%Y-%m-%d") 
         
         el_rfc       = rfc_completo("fisica", nombres_ls, f_inicio)

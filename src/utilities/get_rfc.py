@@ -51,6 +51,59 @@ str_espacios  = compose_ls([partial( str_sub, " +", " "), str.strip])
 
 compose_apply = lambda x, fn_ls: list(map(compose_ls(fn_ls), x))
 
+#%%
+
+class Nombres:
+
+    def __init__(self, nombres_ls):
+        nombres_0       = compose_apply(nombres_ls, 
+            [str_chars, str.upper, str_normaliza])
+
+        self.la_cadena  = str_espacios(" ".join(nombres_0))
+        self.la_lista   = compose_apply(nombres_0, [str_palabras, str_espacios])
+        
+        self.identificar_elementos()
+        
+
+    def identificar_elementos(self):
+        la_lista     = self.la_lista
+        
+        apellidos    = la_lista[:2]
+        los_nombres  = la_lista[ 2].split(" ")
+        usar_primero = (len(los_nombres) == 1) | (los_nombres[0] not in NOMBRES_NAZARENOS)
+        
+        self.apellido_p  = la_lista[0]
+        self.apellido_m  = la_lista[1]
+        self.nombres     = la_lista[2]
+        
+        self.k_nombres   = len(los_nombres)
+        self.nombre_base = los_nombres[0] if usar_primero else los_nombres[1]
+        self.un_apellido = "".join(apellidos) if ("" in apellidos) else None
+
+
+    def obtener_iniciales(self, modo="estandar"):
+        if   modo == "estandar":
+            iniciales = list(map(lambda x: x[0], self.la_lista))
+
+        elif modo == "RFC":
+            vocales_p = list(filter(lambda letra: letra in "AEIOU", self.apellido_p[1:]))
+                        
+            if self.un_apellido:
+                iniciales = self.un_apellido[:2] + self.nombre_base[:2]
+
+            elif len(self.apellido_p) < 3 | len(vocales_p) < 1:
+                iniciales = self.apellido_p[0] + self.apellido_m[0] + self.nombre_base[:2]
+            
+            else: 
+                iniciales= (self.apellido_p[0] + vocales_p[0] + 
+                            self.apellido_m[0] + self.nombre_base[0])
+            
+            if iniciales in INCONVENIENTES: 
+                iniciales = iniciales[0:3] + "X"
+            
+        self.iniciales = iniciales
+
+        return iniciales
 
 
 def rfc_completo(tipo: str, nombres_ls: list, f_inicio: dt) -> str:  
@@ -118,58 +171,6 @@ def verificador(rfc_12: str) -> str:
     el_verificador = LLAVES_4[calc_suma % 11]
     return (el_verificador)
 
-
-class Nombres:
-
-    def __init__(self, nombres_ls):
-        nombres_0       = compose_apply(nombres_ls, 
-            [str_chars, str.upper, str_normaliza])
-
-        self.la_cadena  = str_espacios(" ".join(nombres_0))
-        self.la_lista   = compose_apply(nombres_0, [str_palabras, str_espacios])
-        
-        self.identificar_elementos()
-        
-
-    def identificar_elementos(self):
-        la_lista     = self.la_lista
-        
-        apellidos    = la_lista[:2]
-        los_nombres  = la_lista[ 2].split(" ")
-        usar_primero = (len(los_nombres) == 1) | (los_nombres[0] not in NOMBRES_NAZARENOS)
-        
-        self.apellido_p  = la_lista[0]
-        self.apellido_m  = la_lista[1]
-        self.nombres     = la_lista[2]
-        
-        self.k_nombres   = len(los_nombres)
-        self.nombre_base = los_nombres[0] if usar_primero else los_nombres[1]
-        self.un_apellido = "".join(apellidos) if ("" in apellidos) else None
-
-
-    def obtener_iniciales(self, modo="estandar"):
-        if   modo == "estandar":
-            iniciales = list(map(lambda x: x[0], self.la_lista))
-
-        elif modo == "RFC":
-            vocales_p = list(filter(lambda letra: letra in "AEIOU", self.apellido_p[1:]))
-                        
-            if self.un_apellido:
-                iniciales = self.un_apellido[:2] + self.nombre_base[:2]
-
-            elif len(self.apellido_p) < 3 | len(vocales_p) < 1:
-                iniciales = self.apellido_p[0] + self.apellido_m[0] + self.nombre_base[:2]
-            
-            else: 
-                iniciales= (self.apellido_p[0] + vocales_p[0] + 
-                            self.apellido_m[0] + self.nombre_base[0])
-            
-            if iniciales in INCONVENIENTES: 
-                iniciales = iniciales[0:3] + "X"
-            
-        self.iniciales = iniciales
-
-        return iniciales
 
 
 
