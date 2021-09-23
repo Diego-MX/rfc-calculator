@@ -1,8 +1,6 @@
 deploy_tools
 config
 
-
-
 ####  Python
 *.ipynb
 *.DS_Store

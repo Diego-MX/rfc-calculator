@@ -9,14 +9,8 @@ from src.utilities.get_rfc import rfc_completo
 app = Flask(__name__)
 
 
-@app.route("v1/validation-services/validate-rfc", methods=["POST", "GET"])
-def validate_rfc():
-    pass
-
-
-@app.route("v1/validation-services/get-rfc", methods=["POST", "GET"])
+@app.route("/v1/validation-services/get-rfc", methods=["POST", "GET"])
 def get_rfc():
-    
     an_input = request.json
     try:
         validate_input(an_input)
@@ -24,10 +18,10 @@ def get_rfc():
         # invalid input
         response = {
             "code"          : "0001",
-            "type"          : "validation/input",
             "status_code"   : "400",
-            "timestamp"     : str(dt.now()),
+            "type"          : "validation/input",
             "instance"      : "input/pricing_model/invalid_structure",
+            "timestamp"     : str(dt.now()),
             "detail"        : str(e)
         }
         return (jsonify(response), 400)
@@ -45,14 +39,18 @@ def get_rfc():
     except Exception as e:
         an_error = {
             "code"          : "0002",
-            "type"          : "internal-error",
             "status_code"   : "500",
-            "timestamp"     : str(dt.now()),
+            "type"          : "internal-error",
             "instance"      : "input/get-rfc/internal-error",
+            "timestamp"     : str(dt.now()),
             "detail"        : str(e)
         }
         return (jsonify(an_error), 500)
     
+# @app.route("/v1/validation-services/validate-rfc", methods=["POST", "GET"])
+# def validate_rfc():
+#     pass
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0")

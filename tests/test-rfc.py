@@ -1,8 +1,8 @@
 import requests
 from unittest import TestCase, main as unit_main
 
-
-URL = "https://wap-validation-services-dev.azurewebsites.net/v1/validation-services/get-rfc"
+URL = "http://localhost:5000/v1/validation-services/get-rfc"
+# URL = "https://wap-validation-services-dev.azurewebsites.net/v1/validation-services/get-rfc"
 
 
 class RfcTestCase(TestCase):

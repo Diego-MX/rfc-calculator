@@ -3,11 +3,11 @@ from datetime import date
 from jsonschema import validate
 from pathlib import Path
 
-ROOT = Path(__file__).parents[2]
+SITE = Path(__file__).parents[2]
 
 
 def validate_input(payload):
-    with open(ROOT/'openapi'/'1-rfc-input.json', 'r') as _f:
+    with open(SITE/'openapi'/'1-rfc-input.json', 'r') as _f:
         input_schema = json.load(_f)
     validate(instance=payload, schema=input_schema)
 
