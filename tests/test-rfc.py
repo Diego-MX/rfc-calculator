@@ -1,13 +1,11 @@
 import requests
-from unittest import TestCase
+from unittest import TestCase, main as unit_main
 
 
 URL = "https://wap-validation-services-dev.azurewebsites.net/rfc"
 
 
 class RfcTestCase(TestCase):
-    def setup(self):
-        pass
 
     def test_correct_usage(self):
         myself = {
@@ -34,3 +32,9 @@ class RfcTestCase(TestCase):
         
         response = requests.post(URL, json=w_missing["input"])
         self.assertEqual(response)
+
+
+
+if __name__ == "__main__": 
+    unit_main()
+
