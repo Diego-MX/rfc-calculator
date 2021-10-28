@@ -9,7 +9,7 @@ env:
   DKR_IMAGE: data-get-rfc-webapp-dev
   DKR_TAG: "1.0.1"
   WAP_SERV: wap-validation-services-dev
-  ACR_HOST: "https://wap-validation-services-dev.azurewebsites.net"
+  ACR_HOST: "datalakeepiccontainerregistry.azurecr.io"
       
 jobs:
   build-and-deploy-dev:
