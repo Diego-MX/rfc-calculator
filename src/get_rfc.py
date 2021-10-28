@@ -7,7 +7,7 @@ from re import sub as str_sub
 
 #%% Herramientas auxiliares. 
 
-from .basic_utils import compose_ls, str_iconv, arg0_to_end, str_multisub
+from .utilities.basic import compose_ls, str_iconv, arg0_to_end, str_multisub
 
 
 #%% Variables auxiliares 
@@ -177,7 +177,7 @@ def verificador(rfc_12: str) -> str:
 if __name__ == "__main__":
     ## Imports preparation.
     
-    import parsers 
+    import src.utilities.parsers as parsers
     
     ## Setup the parsers.
     the_parser = parsers.rfc_parser()

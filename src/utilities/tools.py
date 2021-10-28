@@ -1,15 +1,28 @@
 import json
-from datetime import date
-from jsonschema import validate
+from datetime import datetime as dt
+from jsonschema import validate, exceptions
+from flask import jsonify
 from pathlib import Path
 
 SITE = Path(__file__).parents[2]
 
 
-def validate_input(payload):
-    with open(SITE/'openapi'/'1-rfc-input.json', 'r') as _f:
-        input_schema = json.load(_f)
-    validate(instance=payload, schema=input_schema)
+def response_validate(payload, input_file):
+    try: 
+        with open(input_file, 'r') as _f:
+            input_schema = json.load(_f)
+        validate(instance=payload, schema=input_schema)
+        an_object = {"error" : False}
+    except exceptions.ValidationError as err:
+        response = {
+            "code"          : "0001",
+            "type"          : "validation/input",
+            "status_code"   : "400",
+            "timestamp"     : str(dt.now()),
+            "instance"      : "input/messages_strategy/invalid_structure",
+            "detail"        : str(err) }
+        an_object = {"error" : 400, "output" : (jsonify(response), 400)}
+    return an_object
 
 
 def select_subdict(a_dict, sub_keys):
