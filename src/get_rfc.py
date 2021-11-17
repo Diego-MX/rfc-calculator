@@ -2,7 +2,6 @@
 
 from datetime import datetime as dt
 from functools import partial
-from unicodedata import normalize 
 from re import sub as str_sub
 
 #%% Herramientas auxiliares. 
@@ -53,7 +52,7 @@ compose_apply = lambda x, fn_ls: list(map(compose_ls(fn_ls), x))
 
 #%%
 
-class Nombres:
+class PersonaFisica:
 
     def __init__(self, nombres_ls):
         nombres_0       = compose_apply(nombres_ls, 
@@ -65,9 +64,9 @@ class Nombres:
         self.identificar_elementos()
         
 
-    def identificar_elementos(self):
+    def identificar_elementos(self, elems=None):
         la_lista     = self.la_lista
-        
+
         apellidos    = la_lista[:2]
         los_nombres  = la_lista[ 2].split(" ")
         usar_primero = (len(los_nombres) == 1) | (los_nombres[0] not in NOMBRES_NAZARENOS)
@@ -113,7 +112,7 @@ def rfc_completo(tipo: str, nombres_ls: list, f_inicio: dt) -> str:
     #   - 1 elemento con espacios en persona moral. 
     # F_INICIO: tiene formato de fecha. 
     
-    nombres_obj = Nombres(nombres_ls)
+    nombres_obj = PersonaFisica(nombres_ls)
 
     rfc_0       = rfc_inicial(tipo, nombres_obj)
     rfc_1       = (rfc_0 + f_inicio.strftime("%y%m%d"))
@@ -121,14 +120,14 @@ def rfc_completo(tipo: str, nombres_ls: list, f_inicio: dt) -> str:
     homoclave_1 = homoclave(nombres_obj.la_cadena)
     rfc_2       = rfc_1 + homoclave_1
     
-    verificador_2   = verificador(rfc_2)
-    rfc_final       = rfc_2 + verificador_2 
+    verificador_2 = verificador(rfc_2)
+    rfc_final     = rfc_2 + verificador_2 
 
     return rfc_final
 
 
 #%% Componentes secundarios
-def rfc_inicial(tipo: str, nombres_obj: Nombres) -> str:
+def rfc_inicial(tipo: str, nombres_obj: PersonaFisica) -> str:
     # INPUTS como arriba; 
     # -> INICIALES   : cuatro letras
     # -> NOMBRES_STR : nombres concatenados
@@ -148,12 +147,13 @@ def rfc_inicial(tipo: str, nombres_obj: Nombres) -> str:
 
 def homoclave(nombres: str) -> str:
     # En realidad la homoclave consta de dos caracteres. 
-    char_posiciones = [LLAVES_1.index(c_char) for c_char in list(nombres)] 
-    posiciones_str  = ["0"] + [f"{c_pos:02}" for c_pos in char_posiciones]
+    char_posiciones = [LLAVES_1.index(c_char) for c_char in list(nombres)  ] 
+    posiciones_str  = ["0"] + [f"{c_pos:02}"  for c_pos  in char_posiciones]
 
     cadena      = [int(c_char) for c_char in "".join(posiciones_str)] 
     calc_trippy = sum(10*cadena[i]*cadena[i+1] + cadena[i+1]**2
-                       for i in range(len(cadena) - 1)) % 1000
+                        for i in range(len(cadena) - 1)
+                     ) % 1000
     
     cociente, residuo = calc_trippy // 34, calc_trippy % 34
     

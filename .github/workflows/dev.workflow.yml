@@ -6,11 +6,13 @@ on:
       - dev
 
 env:
+  WAP_SERV : wap-validation-services-dev
+  ACR_HOST : datalakeepiccontainerregistry.azurecr.io
+  ACR_USER : DatalakeEpicContainerRegistry
   DKR_IMAGE: data-get-rfc-webapp-dev
-  DKR_TAG: "1.0.1"
-  WAP_SERV: wap-validation-services-dev
-  ACR_HOST: "datalakeepiccontainerregistry.azurecr.io"
-      
+  DKR_TAG  : "1.0.1"
+   
+    
 jobs:
   build-and-deploy-dev:
     environment: dev
@@ -31,7 +33,7 @@ jobs:
         image     : ${{ env.DKR_IMAGE }}
         registry  : ${{ env.ACR_HOST }}
         tags      : ${{ env.DKR_TAG }}
-        username  : ${{ secrets.ACR_USER }}
+        username  : ${{ env.ACR_USER }}
         password  : ${{ secrets.ACR_PASS }}
         
         

@@ -1,3 +1,4 @@
+from dotenv.main import load_dotenv
 import requests
 from unittest import TestCase, main as unit_main
 
@@ -36,21 +37,28 @@ if __name__ == "__main__":
     import config
     
     ENV = sys.argv.pop() if len(sys.argv) > 1 else config.DEFAULT_ENV
-    URL = config.ENV_URLS[ENV]
+    URL = config.URLS[ENV]
 
     unit_main()
 
 if False: 
     from importlib import reload
     from tests import test_rfc
+    from dotenv import load_dotenv
     import config
-    
+    load_dotenv(override=True)
+    reload(config)
 
-    ENV = "local"  # "staging"
-    URL = config.ENV_URLS[ENV]
+    ENV = "qa" # "staging" # "local"  # 
+    URL = config.URLS[ENV]
 
     test_run = test_rfc.RfcTestCase()
     example  = test_run.set_example()
+
+    headers  = {
+        "grant_type": "client_credentials",
+        "client_id": _env(), "client_secret" : "", "scope" : ""}
+    
     response = requests.post(URL, json=example["input"])    
 
 
