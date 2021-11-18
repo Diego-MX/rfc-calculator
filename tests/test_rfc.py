@@ -18,11 +18,12 @@ class RfcTestCase(TestCase):
 
     def test_correct_usage(self):
         myself = self.set_example()
-
-        response = requests.post(URL, json=myself["input"])
+        response = requests.get(URL, json=myself["input"])
         obtained = response.json()
         self.assertDictEqual(obtained, myself["output"])
 
+    def need_test_to_check_wrong_date_format(self): 
+        pass
 
     def later_test_missing_arguments_returns_500(self):
         w_missing = self.set_example()
@@ -38,28 +39,28 @@ if __name__ == "__main__":
     
     ENV = sys.argv.pop() if len(sys.argv) > 1 else config.DEFAULT_ENV
     URL = config.URLS[ENV]
-
+    
     unit_main()
+
 
 if False: 
     from importlib import reload
     from tests import test_rfc
-    from dotenv import load_dotenv
     import config
     load_dotenv(override=True)
     reload(config)
 
-    ENV = "qa" # "staging" # "local"  # 
+    ENV = "local_fastapi"  # "qa" # "staging" # 
     URL = config.URLS[ENV]
 
     test_run = test_rfc.RfcTestCase()
     example  = test_run.set_example()
 
-    headers  = {
-        "grant_type": "client_credentials",
-        "client_id": _env(), "client_secret" : "", "scope" : ""}
+    # headers  = {
+    #     "grant_type": "client_credentials",
+    #     "client_id": _env(), "client_secret" : "", "scope" : ""}
     
-    response = requests.post(URL, json=example["input"])    
+    response = requests.get(URL, json=example["input"])    
 
 
 

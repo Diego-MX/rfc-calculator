@@ -15,12 +15,12 @@ def response_validate(payload, input_file):
         an_object = {"error" : False}
     except exceptions.ValidationError as err:
         response = {
+            "timestamp"     : str(dt.now()),
+            "detail"        : str(err),
             "code"          : "0001",
             "type"          : "validation/input",
             "status_code"   : "400",
-            "timestamp"     : str(dt.now()),
-            "instance"      : "input/messages_strategy/invalid_structure",
-            "detail"        : str(err) }
+            "instance"      : "input/messages_strategy/invalid_structure" }
         an_object = {"error" : 400, "output" : (jsonify(response), 400)}
     return an_object
 

@@ -1,14 +1,12 @@
-import os
-from pathlib import Path
 from flask import Flask, request
 
 from src import engine 
 from src.utilities import tools
+import config
 
-SITE = Path(__file__).parent if '__file__' in globals() else Path(os.getcwd())
-
-
+SITE = config.SITE
 app  = Flask(__name__)
+
 
 @app.route("/", methods=["GET"])
 def base_url():

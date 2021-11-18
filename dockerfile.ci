@@ -1,14 +1,14 @@
-
     
 
-FROM python:3.8
-WORKDIR /code
-COPY requirements.txt .
-ADD dockerfile.ci .
-RUN pip install -r requirements.txt
-
+FROM python:3.8-slim
+WORKDIR /app
 COPY . .
-EXPOSE 5000
-CMD ["python", "./flask-app.py"]
+RUN pip install --trusted-host pypi.python.org -r /app/requirements.txt
+EXPOSE 80
+CMD ["python", "./app-fastapi.py"]
+
+# RUN pip install -r /app/requirements.txt
+# EXPOSE 5000
+# CMD ["./refs/deploy_tools/serve-api.sh"]
 
 

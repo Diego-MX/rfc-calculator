@@ -1,29 +1,41 @@
 from operator import itemgetter
 from datetime import datetime as dt
+from fastapi.exceptions import HTTPException
 
 from flask import jsonify
 from src.get_rfc import rfc_completo
 
 
-def process_request(input): 
-    a_person = input.get("personPhysical")
+def process_request(input, server="flask"): 
     try: 
+        a_person   = input.get("personPhysical")
         campos_ls  = ["lastName", "maternalLastName", "firstName"]
         nombres_ls = itemgetter(*campos_ls)(a_person)
         f_inicio   = dt.strptime(a_person.get("dateOfBirth"), "%Y-%m-%d") 
-        
         el_rfc       = rfc_completo("fisica", nombres_ls, f_inicio)
         la_respuesta = { "rfc" : el_rfc }
-        
-        return (jsonify(la_respuesta), 200)
-
+        estatus      = 200
     except Exception as exc:
-        an_error = {
+        la_respuesta = {
             "code"          : "0002",
             "status_code"   : "500",
             "type"          : "internal-error",
             "instance"      : "input/get-rfc/internal-error",
             "timestamp"     : str(dt.now()),
-            "detail"        : str(exc)
-        }
-        return (jsonify(an_error), 500)
+            "detail"        : str(exc)}
+        estatus = 500
+
+    if  server=="flask":
+        return (jsonify(la_respuesta), estatus)
+    
+    elif server == "fastapi": 
+        try: 
+            f_inicio   = dt.strptime(a_person.get("dateOfBirth"), "%Y-%m-%d") 
+        except ValueError:
+            a_response = HTTPException(status_code=400, 
+                detail="dateOfBirth: Incorrect data format, use YYYY-MM-DD")
+            raise a_response
+        return la_respuesta    
+        
+    
+

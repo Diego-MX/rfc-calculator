@@ -9,7 +9,7 @@ env:
   WAP_SERV : wap-validation-services-dev
   ACR_HOST : datalakeepiccontainerregistry.azurecr.io
   ACR_USER : DatalakeEpicContainerRegistry
-  DKR_IMAGE: data-get-rfc-webapp-dev
+  DKR_IMAGE: data-functions-wap-dev
   DKR_TAG  : "1.0.1"
    
     

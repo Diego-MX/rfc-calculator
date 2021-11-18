@@ -1,2 +1,4 @@
-Flask
 jsonschema
+uvicorn
+fastapi
+Flask
