@@ -10,7 +10,7 @@ app  = Flask(__name__)
 
 @app.route("/", methods=["GET"])
 def base_url():
-    return "Uploaded, version: 1.0.3"
+    return "Uploaded, version: 1.0.2"
 
 
 # @app.route("/v1/validation-services/get-rfc", methods=["POST", "GET"])
