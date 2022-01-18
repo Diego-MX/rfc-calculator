@@ -2,3 +2,5 @@ jsonschema
 uvicorn
 fastapi
 Flask
+
+orjson

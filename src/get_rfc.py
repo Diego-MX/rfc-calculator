@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 
-from datetime import datetime as dt
+import datetime as dt 
 from functools import partial
 from re import sub as str_sub
 
+from typing import List
+from dataclasses import dataclass
 #%% Herramientas auxiliares. 
 
 from .utilities.basic import compose_ls, str_iconv, arg0_to_end, str_multisub
@@ -40,20 +42,32 @@ NOMBRES_NAZARENOS = ["MARIA", "JOSE"]
 
 #%% 
 
-regex_ignorar = dict( (f"\b{palabra}\b", " ") for palabra in IGNORAR_NOMBRE)
+regex_ignorar = dict( (rf"\b{palabra}\b", " ") for palabra in IGNORAR_NOMBRE)
 dict_chars    = dict( (c_char, "") for c_char in IGNORAR_CHARS["fisica"])
 
 str_normaliza = partial( arg0_to_end(str_iconv), "ÁÉÍÓÚ", "AEIOU")
-str_chars     = partial( str_multisub, sub_dict=dict_chars)
-str_palabras  = partial( str_multisub, sub_dict=regex_ignorar)
+str_chars     = partial( str_multisub, sub_dict=dict_chars, escape=True)
+str_palabras  = partial( str_multisub, sub_dict=regex_ignorar, escape=False)
 str_espacios  = compose_ls([partial( str_sub, " +", " "), str.strip])
 
 compose_apply = lambda x, fn_ls: list(map(compose_ls(fn_ls), x))
 
 #%%
 
-class PersonaFisica:
+with_dataclass = False
 
+if with_dataclass: 
+    @dataclass
+    class PersonaFisica:
+        nombres_ls: List[str]
+
+        def __post_init__(self):
+            pass # self.rfc = calcular_RFC
+
+
+
+
+class PersonaFisica:
     def __init__(self, nombres_ls):
         nombres_0       = compose_apply(nombres_ls, 
             [str_chars, str.upper, str_normaliza])
@@ -64,7 +78,7 @@ class PersonaFisica:
         self.identificar_elementos()
         
 
-    def identificar_elementos(self, elems=None):
+    def identificar_elementos(self):
         la_lista     = self.la_lista
 
         apellidos    = la_lista[:2]
@@ -85,6 +99,7 @@ class PersonaFisica:
             iniciales = list(map(lambda x: x[0], self.la_lista))
 
         elif modo == "RFC":
+            
             vocales_p = list(filter(lambda letra: letra in "AEIOU", self.apellido_p[1:]))
                         
             if self.un_apellido:
@@ -105,7 +120,7 @@ class PersonaFisica:
         return iniciales
 
 
-def rfc_completo(tipo: str, nombres_ls: list, f_inicio: dt) -> str:  
+def rfc_completo(tipo: str, nombres_ls: list, f_inicio: dt.datetime) -> str:  
     # TIPO: "fisica" o "moral"
     # NOMBRES_LS tiene: 
     #   - 3 elementos: apellido_p, apellido_m, nombres_juntos; en persona física.
@@ -185,7 +200,7 @@ if __name__ == "__main__":
 
     el_rfc = rfc_completo("fisica",  
         nombres_ls = [the_args.apellido_p, the_args.apellido_m, the_args.nombres], 
-        f_inicio   = dt.strptime(the_args.f_inicio, "%Y-%m-%d"))
+        f_inicio   = dt.datetime.strptime(the_args.f_inicio, "%Y-%m-%d"))
 
     print(f"\tEl RFC es: {el_rfc}")
     

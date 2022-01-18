@@ -2,8 +2,10 @@ from dotenv.main import load_dotenv
 import requests
 from unittest import TestCase, main as unit_main
 
-class RfcTestCase(TestCase):
-    def set_example(self): 
+
+def set_example(type=None): 
+    
+    if (type is None) or (type == "simple"):
         an_example = {
             "input" : { 
                 "personPhysical" : { 
@@ -13,20 +15,24 @@ class RfcTestCase(TestCase):
                     "dateOfBirth"       : "1983-12-27"} }, 
             "output"    : {
                 "rfc"   : "VIPD831227DH2"} }
-        return an_example
+    return an_example
 
+
+class RfcTestCase(TestCase):
+    
 
     def test_correct_usage(self):
-        myself = self.set_example()
+        myself = set_example()
         response = requests.get(URL, json=myself["input"])
         obtained = response.json()
         self.assertDictEqual(obtained, myself["output"])
+
 
     def need_test_to_check_wrong_date_format(self): 
         pass
 
     def later_test_missing_arguments_returns_500(self):
-        w_missing = self.set_example()
+        w_missing = set_example()
         w_missing["input"]["personPhysical"].pop("firstName")
         
         response = requests.post(URL, json=w_missing["input"])
@@ -35,10 +41,10 @@ class RfcTestCase(TestCase):
 
 if __name__ == "__main__": 
     import sys 
-    import config
+    from config import URLS, DEFAULT_ENV
     
-    ENV = sys.argv.pop() if len(sys.argv) > 1 else config.DEFAULT_ENV
-    URL = config.URLS[ENV]
+    ENV = sys.argv.pop() if len(sys.argv) > 1 else DEFAULT_ENV
+    URL = URLS[ENV]
     
     unit_main()
 
@@ -49,12 +55,13 @@ if False:
     import config
     load_dotenv(override=True)
     reload(config)
+    from config import URLS
 
-    ENV = "local_fastapi"  # "qa" # "staging" # 
+    ENV = "local-fastapi"  # "qa" # "staging" # 
     URL = config.URLS[ENV]
 
     test_run = test_rfc.RfcTestCase()
-    example  = test_run.set_example()
+    example  = set_example()
 
     # headers  = {
     #     "grant_type": "client_credentials",

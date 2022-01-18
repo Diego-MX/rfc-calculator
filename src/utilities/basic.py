@@ -1,6 +1,6 @@
 
 from functools import reduce, partial, wraps
-from re import sub as str_sub, escape
+from re import sub as str_sub, escape as re_escape
 
 def move_args(func, k): 
     """Change k argument to last position."""
@@ -13,7 +13,7 @@ def move_args(func, k):
 
 
 def identity(x): return x
-
+ 
 def eval_func(func, *args, **kwargs): return func(*args, **kwargs)
 
 def compose_2(inner, outer): return lambda x: outer(inner(x))
@@ -39,8 +39,11 @@ def method_as_func(method, *args):
     return the_function
 
 
-def str_multisub(x_str, sub_dict): 
-    f_reducer = lambda x, k_v: str_sub(escape(k_v[0]), k_v[1], x)
+def str_multisub(x_str, sub_dict, escape=False): 
+    if escape: 
+        f_reducer = lambda x, k_v: str_sub(re_escape(k_v[0]), k_v[1], x)
+    else: 
+        f_reducer = lambda x, k_v: str_sub(k_v[0], k_v[1], x)
     
     str_subed = reduce(f_reducer, sub_dict.items(), x_str)
     return str_subed
