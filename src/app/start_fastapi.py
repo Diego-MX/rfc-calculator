@@ -13,7 +13,8 @@ debug = ("debug" in sys.argv)
 
 app = FastAPI(title="Cálculo de RFC Personas Físicas",
     description=f"Aquí encontraras una manera de calcular el RFC completo con tu nombre y fecha de nacimiento (Personas Físicas). Asegurate de mandar en el campo de dateOfBirth la fecha de nacimiento en formato YYYY-DD-MM.",
-    version=VERSION, 
+    version=VERSION,
+    root_path="data/docs/v1/validation-services",
     default_response_class=ORJSONResponse)
 
 @app.get("/")
