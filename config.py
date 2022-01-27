@@ -4,7 +4,7 @@ from pathlib import Path
 SITE = Path(__file__).parent if "__file__" in globals() else Path(os.getcwd())
 
 ENV      = "managed"
-VERSION  = "1.0.6"
+VERSION  = "1.0.7"
 
 
 URLS = {
@@ -28,7 +28,7 @@ ENV_KEYS = {
 } }
 
 PATH_DIRS = {
-    "managed" : Path("/temp"), 
+    "managed" : Path("/tmp"), 
     "local"   : SITE/"refs/temp", 
 }
 
