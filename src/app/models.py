@@ -11,9 +11,15 @@ class PersonPhysical(BaseModel):
     maternalLastName: Optional[str] = None
     
 
+
 class RequestRFC(BaseModel): 
     personPhysical: PersonPhysical
 
+
+class OffensiveResponse(BaseModel): 
+    alias : str
+    offense: Optional[str] = None
+    offenseType: Optional[str] = None
 
 
 class ORJSONResponse(JSONResponse):

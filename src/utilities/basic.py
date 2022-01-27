@@ -1,6 +1,7 @@
 
 from functools import reduce, partial, wraps
 from re import sub as str_sub, escape as re_escape
+from unidecode import unidecode as str_delatinize
 
 def move_args(func, k): 
     """Change k argument to last position."""
@@ -56,6 +57,8 @@ def str_iconv(x_str, chars_in, chars_out):
     else: 
         raise Exception("CHARS_IN and CHARS_OUT must have the same length.")
     return str_subed
+
+
 
 
 
