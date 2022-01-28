@@ -1,11 +1,14 @@
 jsonschema
 uvicorn
 fastapi
-Flask
+#Flask
+
 pandas
 pyarrow
+
 orjson
 Unidecode
+
 python-dotenv
 azure-identity
 azure-storage-blob

@@ -11,12 +11,12 @@ from config import VERSION
 
 debug = ("debug" in sys.argv)
 
-app = FastAPI(title="Cálculo de RFC Personas Físicas", version=VERSION,
-    description=f"Calcula el RFC para Personas Físicas. El formato de fecha de nacimiento YYYY-DD-MM.",
+app = FastAPI(title="Validación de servicios", version=VERSION,
     openapi_tags=[
-        { "name": "RFC"}, 
-        { "name": "Alias" }, 
-        { "name": "Base", "description": "Check base endpoint and version"}, 
+        { "name": "RFC", 
+            "description": "Calcula el RFC para Personas Físicas. El formato de fecha de nacimiento YYYY-DD-MM." }, 
+        { "name": "Alias", "description": "Verifica que un alias no tenga palabras altisonantes u ofensivas." }, 
+        { "name": "Base", "description": "Check base endpoint and version" }, 
         { "name": "Legacy" }], 
     root_path="data/docs/v1/validation-services",
     default_response_class=ORJSONResponse)
@@ -38,14 +38,14 @@ async def person_physical(a_request: RequestRFC):
 @app.get("/get-rfc", tags=["Legacy"])
 async def rfc_get(a_request: RequestRFC):    
     an_input = loads(a_request.json())
-    a_response = engine.process_request(an_input)
+    a_response = engine.process_rfc_physical(an_input)
     return a_response
 
 @app.post("/get-rfc", tags=["Legacy"])
 async def rfc_post(a_request: RequestRFC):    
     an_input = loads(a_request.json())
     
-    a_response = engine.process_request(an_input)
+    a_response = engine.process_rfc_physical(an_input)
     return a_response
 
 @app.get("/approve-alias/{alias}", tags=["Alias"], 

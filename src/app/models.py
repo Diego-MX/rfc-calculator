@@ -16,6 +16,7 @@ class RequestRFC(BaseModel):
     personPhysical: PersonPhysical
 
 
+
 class OffensiveResponse(BaseModel): 
     alias : str
     offense: Optional[str] = None
