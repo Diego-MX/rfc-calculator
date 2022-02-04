@@ -1,5 +1,3 @@
-# Conversión de Flask a FastAPI y uvicorn.
-# TODO: Better error handling with dates and errors raised.
 import sys
 from fastapi import FastAPI
 from json import loads
@@ -11,12 +9,12 @@ from config import VERSION
 
 debug = ("debug" in sys.argv)
 
-app = FastAPI(title="Validación de servicios", version=VERSION,
+app = FastAPI(title="Service Validation", version=VERSION,
     openapi_tags=[
         { "name": "RFC", 
-            "description": "Calcula el RFC para Personas Físicas. El formato de fecha de nacimiento YYYY-DD-MM." }, 
-        { "name": "Alias", "description": "Verifica que un alias no tenga palabras altisonantes u ofensivas." }, 
-        { "name": "Base", "description": "Check base endpoint and version" }, 
+            "description": "Obtain RFC-ID for Physical Persons. Date format is\n YYYY-DD-MM." }, 
+        { "name": "Alias", "description": "Verify an alias doesn't contain offensive or curse words." }, 
+        { "name": "Base", "description": "Check base endpoint and version." }, 
         { "name": "Legacy" }], 
     root_path="data/docs/v1/validation-services",
     default_response_class=ORJSONResponse)
@@ -27,7 +25,7 @@ async def root():
 
 
 # Este es el bueno. 
-@app.get("/rfc-pf", tags=["RFC"])
+@app.get("/rfc-ph", tags=["RFC"])
 async def person_physical(a_request: RequestRFC):    
     an_input   = loads(a_request.json())    
     a_response = engine.process_rfc_physical(an_input)

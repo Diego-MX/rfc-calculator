@@ -57,7 +57,7 @@ if False:
     reload(config)
     from config import URLS
 
-    ENV = "local-fastapi"  # "qa" # "staging" # 
+    ENV = "staging"  # "qa" # "staging" # 
     URL = config.URLS[ENV]
 
     test_run = test_rfc.RfcTestCase()

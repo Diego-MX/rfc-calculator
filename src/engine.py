@@ -37,7 +37,7 @@ def process_rfc_physical(an_input):
 
 def approve_alias(an_alias): 
     offensive_df  = check_feather_file("offensive-words.feather").dropna()
-    offensive_srs   = offensive_df["Phrase"].str.lower().apply(str_delatinize)
+    offensive_srs = offensive_df["Phrase"].str.lower().apply(str_delatinize)
 
     offensive_str_2 = "|".join( offensive_srs.tolist() )
     offensive_str_1 = re.sub(r" ?\((.*?)\)", r"|\1", offensive_str_2)

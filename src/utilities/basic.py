@@ -1,7 +1,7 @@
 
 from functools import reduce, partial, wraps
 from re import sub as str_sub, escape as re_escape
-from unidecode import unidecode as str_delatinize
+
 
 def move_args(func, k): 
     """Change k argument to last position."""
