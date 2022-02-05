@@ -1,4 +1,4 @@
-name: Functions for Backbase, RFC. 
+name: Build QAs
 
 on: 
   push:
@@ -8,11 +8,11 @@ on:
 env:
   WAP_SERV : as-validationServices-data-qas
   DKR_IMAGE: data-functions-wap-qas
-  DKR_TAG  : "1.0.8"
+  DKR_TAG  : "1.0.9"
    
     
 jobs:
-  build-and-deploy-dev:
+  build-and-deploy-qas:
     environment: qas
     runs-on: ubuntu-latest
     
@@ -39,6 +39,6 @@ jobs:
       uses: azure/webapps-deploy@v2
       with:
         app-name       : ${{secrets.WAP_SERV}}
-        images         : ${{env.ACR_HOST}}/${{env.DKR_IMAGE}}:${{env.DKR_TAG}}
+        images         : ${{secrets.ACR_HOST}}/${{env.DKR_IMAGE}}:${{env.DKR_TAG}}
         publish-profile: ${{secrets.WAP_PUBLISH}}
         

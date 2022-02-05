@@ -1,6 +1,7 @@
 
 from functools import reduce, partial, wraps
 from re import sub as str_sub, escape as re_escape
+from unidecode import unidecode 
 
 
 def move_args(func, k): 
@@ -59,6 +60,7 @@ def str_iconv(x_str, chars_in, chars_out):
     return str_subed
 
 
+str_delatinize = unidecode
 
 
 

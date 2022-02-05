@@ -1,4 +1,4 @@
-name: Functions for Backbase, RFC. 
+name: Build Dev
 
 on: 
   push:
@@ -10,7 +10,7 @@ env:
   ACR_HOST : datalakeepiccontainerregistry.azurecr.io
   ACR_USER : DatalakeEpicContainerRegistry
   DKR_IMAGE: data-functions-wap-dev
-  DKR_TAG  : "1.0.8"
+  DKR_TAG  : "1.0.9"
    
     
 jobs:
