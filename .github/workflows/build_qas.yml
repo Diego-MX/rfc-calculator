@@ -39,6 +39,6 @@ jobs:
       uses: azure/webapps-deploy@v2
       with:
         app-name       : ${{secrets.WAP_SERV}}
-        images         : ${{env.ACR_HOST}}/${{env.DKR_IMAGE}}:${{env.DKR_TAG}}
+        images         : ${{secrets.ACR_HOST}}/${{env.DKR_IMAGE}}:${{env.DKR_TAG}}
         publish-profile: ${{secrets.WAP_PUBLISH}}
         
