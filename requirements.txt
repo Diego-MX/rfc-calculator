@@ -1,2 +1,13 @@
-Flask
 jsonschema
+uvicorn
+fastapi
+
+pandas
+pyarrow
+
+orjson
+Unidecode
+
+python-dotenv
+azure-identity
+azure-storage-blob
