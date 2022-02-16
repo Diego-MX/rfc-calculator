@@ -3,9 +3,8 @@ from operator import itemgetter
 from datetime import datetime as dt
 from fastapi.exceptions import HTTPException
 import pandas as pd
-from azure.storage.blob import BlobServiceClient
 
-from config import ENV, ENV_KEYS, PATH_DIRS
+from config import ENV, PATH_DIRS
 from src.get_rfc import rfc_completo
 from src.authenticate import AzureResourcer
 from src.utilities.basic import str_delatinize
@@ -62,10 +61,9 @@ def check_feather_file(a_file):
 
     if not file_at_dir.exists(): 
         resourcer = AzureResourcer(ENV) 
-        blob_envs = ENV_KEYS["platform"]["storage"]
         
-        blob_client = BlobServiceClient(blob_envs["url"], resourcer.credential)
-        blob_file   = blob_client.get_blob_client("bronze", f"{blob_envs['root']}/{a_file}")
+        (client, path) = resourcer.get_blob_service()
+        blob_file = client.get_blob_client("bronze", f"{path}/{a_file}")
 
         with open(file_at_dir, "wb") as _f: 
             _f.write(blob_file.download_blob().readall())
