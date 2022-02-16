@@ -4,7 +4,7 @@ from datetime import datetime as dt
 from fastapi.exceptions import HTTPException
 import pandas as pd
 
-from config import ENV, PATH_DIRS
+from config import ENV, ENV_KEYS, PATH_DIRS
 from src.get_rfc import rfc_completo
 from src.authenticate import AzureResourcer
 from src.utilities.basic import str_delatinize
