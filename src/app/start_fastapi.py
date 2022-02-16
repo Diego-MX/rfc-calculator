@@ -9,6 +9,7 @@ from config import VERSION
 
 debug = ("debug" in sys.argv)
 
+
 app = FastAPI(title="Service Validation", version=VERSION,
     openapi_tags=[
         { "name": "RFC", 

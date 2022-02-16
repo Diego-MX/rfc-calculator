@@ -1,38 +1,56 @@
 import os
 from pathlib import Path
 
-SITE = Path(__file__).parent if "__file__" in globals() else Path(os.getcwd())
+SITE = Path(__file__).parent if '__file__' in globals() else Path(os.getcwd())
 
-ENV      = "managed"
-VERSION  = "1.0.9"
+ENV      = os.getenv('ENV', 'local')  # 'local', 'staging', 'qas', 'databricks'
+VERSION  = '1.0.10'
 
 
+# Estos son los endpoints finales para hacer pruebas. 
 URLS = {
-    "local-flask"   : "http://localhost:5000/get-rfc", 
-    "local-fastapi" : "http://localhost:80/rfc-pf", 
-    "staging"       : "https://wap-validation-services-dev.azurewebsites.net/get-rfc",
-    "qa"            : "https://apim-crosschannel-tech-dev.azure-api.net/data/validation-services/v1/get-rfc/"
+    'local-flask'   : 'http://localhost:5000/get-rfc', 
+    'local-fastapi' : 'http://localhost:80/rfc-pf', 
+    'staging'       : 'https://wap-validation-services-dev.azurewebsites.net/get-rfc',
+    'qa'            : 'https://apim-crosschannel-tech-dev.azure-api.net/data/validation-services/v1/get-rfc/'
 }
 
 ENV_KEYS = {
-    "platform" : {
-        "service-principal" : {
-            "client_id"       : "SP_APP_ID", 
-            "client_secret"   : "SP_APP_SECRET", 
-            "tenant_id"       : "AZ_TENANT", 
-            "subscription_id" : "AZ_SUBSCRIPTION" }, 
-        "storage"   : {
-            "name"  : "lakehylia", 
-            "url"   : "https://lakehylia.blob.core.windows.net/", 
-            "root"  : "product/epic-catalogs/app-services" }, 
-} }
+    'local' : {
+        'service-principal' : {
+            'client_id'       : 'SP_APP_ID', 
+            'client_secret'   : 'SP_APP_SECRET', 
+            'tenant_id'       : 'AZ_TENANT', 
+            'subscription_id' : 'AZ_SUBSCRIPTION' }, 
+        'storage'   : {
+            'name'  : 'lakehylia', 
+            'url'   : 'https://lakehylia.blob.core.windows.net/', 
+            'root'  : 'product/epic-catalogs/app-services' 
+    }   }, 
+    'dev'   : {
+        'storage'   : {
+            'name'  : 'lakehylia', 
+            'url'   : 'https://lakehylia.blob.core.windows.net/', 
+            'root'  : 'product/epic-catalogs/app-services' 
+    }   }, 
+    'qas'   : {
+        'storage'   : {
+            'name'  : 'stlakehyliaqas', 
+            'url'   : 'https://stlakehyliaqas.blob.core.windows.net/', 
+            'root'  : 'product/epic-catalogs/app-services' }
+} } 
 
+
+# Se utiliza para guardar archivos temporales, dependiendo del ambiente. 
 PATH_DIRS = {
-    "managed" : Path("/tmp"), 
-    "local"   : SITE/"refs/temp", 
+    'local' : SITE/'refs/temp', 
+    'dev'   : Path('/tmp'), 
+    'qas'   : Path('/tmp')
+    
 }
 
-DEFAULT_ENV = "staging"
+# Este se usa para correr tests. 
+DEFAULT_ENV = 'staging'
 
 
 
