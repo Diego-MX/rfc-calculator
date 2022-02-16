@@ -48,7 +48,7 @@ async def rfc_post(a_request: RequestRFC):
     return a_response
 
 @app.get("/approve-alias/{alias}", tags=["Alias"], 
-    response_model=OffensiveResponse)
+        response_model=OffensiveResponse)
 async def alias_approval(alias: str): 
     a_response = engine.approve_alias(alias)
     return a_response

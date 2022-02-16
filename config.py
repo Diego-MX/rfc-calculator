@@ -3,8 +3,8 @@ from pathlib import Path
 
 SITE = Path(__file__).parent if '__file__' in globals() else Path(os.getcwd())
 
-ENV      = os.getenv('ENV', 'local')  # 'local', 'staging', 'qas', 'databricks'
-VERSION  = '1.0.10'
+ENV      = os.getenv('ENV', 'local')  # 'local', 'dev', 'qas', 'databricks'
+VERSION  = '1.0.11'
 
 
 # Estos son los endpoints finales para hacer pruebas. 
@@ -50,7 +50,7 @@ PATH_DIRS = {
 }
 
 # Este se usa para correr tests. 
-DEFAULT_ENV = 'staging'
+DEFAULT_ENV = 'dev'
 
 
 
