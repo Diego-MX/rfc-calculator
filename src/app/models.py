@@ -1,20 +1,13 @@
 from pydantic import BaseModel
 from fastapi.responses import JSONResponse
-from typing import List, Any, Optional
+from typing import Any, Optional
 from orjson import dumps
+from src.get_rfc import PersonPhysical
 
-
-class PersonPhysical(BaseModel): 
-    dateOfBirth: str
-    firstName:   str
-    lastName:    Optional[str] = None
-    maternalLastName: Optional[str] = None
-    
 
 
 class RequestRFC(BaseModel): 
     personPhysical: PersonPhysical
-
 
 
 class OffensiveResponse(BaseModel): 

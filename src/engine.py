@@ -1,71 +1,74 @@
 import re
 from operator import itemgetter
 from datetime import datetime as dt
-from fastapi.exceptions import HTTPException
 import pandas as pd
+from fastapi.exceptions import HTTPException
 
-from config import ENV, ENV_KEYS, PATH_DIRS
-from src.get_rfc import rfc_completo
-from src.authenticate import AzureResourcer
+from src.get_rfc import rfc_completo, PersonPhysical
 from src.utilities.basic import str_delatinize
 
 
 def process_rfc_physical(an_input): 
     try: 
-        a_person     = an_input.get("personPhysical")
-        campos_ls    = ["lastName", "maternalLastName", "firstName"]
+        a_person     = an_input.get('personPhysical')
+        campos_ls    = ['last_name', 'maternal_last_name', 'first_name']
         nombres_ls   = itemgetter(*campos_ls)(a_person)
-        f_inicio     = dt.strptime(a_person.get("dateOfBirth"), "%Y-%m-%d")
-        el_rfc       = rfc_completo("fisica", nombres_ls, f_inicio)
-        pre_respuesta = {"rfc" : el_rfc}
-        
+        f_inicio     = dt.strptime(a_person.get('date_of_birth'), '%Y-%m-%d')
+        el_rfc       = rfc_completo('fisica', nombres_ls, f_inicio)
+        return {'rfc' : el_rfc}
+
     except ValueError: 
-        excepcion = HTTPException(status_code=400, 
-            detail="dateOfBirth: Incorrect data fromat, use YYYY-MM-DD")
-        raise excepcion
-    except Exception as exc: 
-        pre_respuesta = {
-            "code"       : "0002",
-            "status_code": "500",
-            "type"       : "internal-error",
-            "instance"   : "input/get-rfc/internal-error",
-            "timestamp"  : str(dt.now()),
-            "detail"     : str(exc)}
-    return pre_respuesta  
+        the_exception = HTTPException(status_code=400, 
+                detail='dateOfBirth: Incorrect data fromat, use YYYY-MM-DD')
+        raise the_exception
+    except Exception as expt: 
+        raise HTTPException(status_code=500, detail=str(expt))
+
+
+def process_rfc_physical_2(person): 
+    try: 
+        the_rfc = person.get_rfc()
+        return {'rfc' : the_rfc}
+    except ValueError: 
+        the_exception = HTTPException(status_code=400, 
+                detail='dateOfBirth: Incorrect data fromat, use YYYY-MM-DD')
+        raise the_exception
+    except Exception as expt: 
+        raise HTTPException(status_code=500, detail=str(expt))
+
+
+def process_curp(person_obj: PersonPhysical):
+    try:
+        the_curp = person_obj.get_curp()
+        return {'curp': the_curp}
+    except AttributeError: 
+        raise HTTPException(status_code=500, 
+            detail='Must include stateOfBirth, gender.')
+    except Exception as expt: 
+        raise HTTPException(status_code=500, detail=str(expt))
 
 
 def approve_alias(an_alias): 
-    offensive_df  = pd.read_feather("refs/temp/offensive-words.feather").dropna()
-    offensive_srs = offensive_df["Phrase"].str.lower().apply(str_delatinize)
+    try: 
+        offensive_df  = pd.read_feather('refs/temp/offensive-words.feather').dropna()
+        offensive_srs = offensive_df['Phrase'].str.lower().apply(str_delatinize)
 
-    offensive_str_2 = "|".join( offensive_srs.tolist() )
-    offensive_str_1 = re.sub(r" ?\((.*?)\)", r"|\1", offensive_str_2)
-    offensive_str   = rf"({(offensive_str_1)})"
-    
-    is_offensive = re.search(offensive_str, an_alias, re.IGNORECASE)
-
-    response = {"alias": an_alias}
-    if is_offensive:
-        offense = is_offensive.group(0).lower()
-        indices = offensive_srs.str.contains(offense)
-        which_offensive = offensive_df.loc[indices, "Type"].tolist()[0]
-        response.update({
-            "offense": offense, 
-            "offenseType" : which_offensive }) 
-            
-    return response
-
-
-def check_feather_file(a_file): 
-    file_at_dir = PATH_DIRS[ENV]/a_file
-
-    if not file_at_dir.exists(): 
-        resourcer = AzureResourcer(ENV) 
+        offensive_str_2 = '|'.join(offensive_srs.tolist())
+        offensive_str_1 = re.sub(r' ?\((.*?)\)', r'|\1', offensive_str_2)
+        offensive_str   = rf'({(offensive_str_1)})'
         
-        (client, path) = resourcer.get_blob_service()
-        blob_file = client.get_blob_client("bronze", f"{path}/{a_file}")
+        is_offensive = re.search(offensive_str, an_alias, re.IGNORECASE)
 
-        with open(file_at_dir, "wb") as _f: 
-            _f.write(blob_file.download_blob().readall())
+        response = {'alias': an_alias}
+        if is_offensive:
+            offense = is_offensive.group(0).lower()
+            indices = offensive_srs.str.contains(offense)
+            which_offensive = offensive_df.loc[indices, 'Type'].tolist()[0]
+            response.update({
+                'offense'     : offense, 
+                'offenseType' : which_offensive}) 
+        return response
 
-    return pd.read_feather(file_at_dir)
+    except Exception as expt: 
+        raise HTTPException(status_code=500, detail=str(expt))
+        

@@ -4,15 +4,14 @@ from pathlib import Path
 SITE = Path(__file__).parent if '__file__' in globals() else Path(os.getcwd())
 
 ENV      = os.getenv('ENV', 'local')  # 'local', 'dev', 'qas', 'databricks'
-VERSION  = '1.0.13'
+VERSION  = '1.0.14'
 
 
 # Estos son los endpoints finales para hacer pruebas. 
 URLS = {
-    'local-flask'   : 'http://localhost:5000/get-rfc', 
-    'local-fastapi' : 'http://localhost:80/rfc-pf', 
-    'staging'       : 'https://wap-validation-services-dev.azurewebsites.net/get-rfc',
-    'qa'            : 'https://apim-crosschannel-tech-dev.azure-api.net/data/validation-services/v1/get-rfc/'
+    'local'   : 'http://localhost:80', 
+    'staging' : 'https://wap-validation-services-dev.azurewebsites.net',
+    'qa'      : 'https://apim-crosschannel-tech-dev.azure-api.net/data/validation-services/v1'
 }
 
 ENV_KEYS = {
