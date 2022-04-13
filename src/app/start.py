@@ -2,7 +2,7 @@ import sys
 from fastapi import FastAPI
 from json import loads
 import uvicorn
-from typing import Optional
+
 
 from .models import RequestValidation, RequestRFC, OffensiveResponse, ORJSONResponse
 from src.get_rfc import PersonPhysical
