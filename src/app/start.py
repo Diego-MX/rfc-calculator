@@ -41,8 +41,8 @@ async def person_physical_rfc(req_person: PersonPhysical):
 
 
 @app.post("/rfc-validate/{rfc_user}/{rfc_calculation}", tags=['ID keys'])
-async def validate_rfc_physical(rfc_user, rfc_calculation):
-    return engine.validate_rfc(rfc_user, rfc_calculation)
+async def validate_rfc_physical(rfc_user:str, rfc_calculated:str):
+    return engine.validate_rfc(rfc_user, rfc_calculated)
 
 
 @app.get("/approve-alias/{alias}", tags=['Alias'], 

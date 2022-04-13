@@ -273,28 +273,30 @@ class PersonPhysical(BaseModel):
         the_inconsistencies = {
             '0': ("Format", "String doesn't have RFC format."), 
             '1': ("Verification Digit", "Verification digit is not valid."), 
-            '2': ("Homonymial Keys", "Mismatch on homonymial, verify names."), 
-            '3': ("Date of birth", "Mismatch on date of birth, verify it."), 
+            '2': ("Homonymial Keys", "Mismatch on homonymial keys, verify names."), 
+            '3': ("Date of birth", "Date of birth doesn't match or not valid."), 
             '4': ("Name initials", "Mismatch on name initials, verify rules.")}
-        
         okays = [False] * 5
 
-        reg_00  = r"[A-Z]{3,4}\d{6}[A-Z\d]{2}\d"
-        okay_01 = has_match(rfc_1[3], r"[0-9]") or has_match(rfc_1[1], r"[AEIOU]")
+
+        regx_01 = r"[A-Z]{3,4}\d{6}[A-Z\d]{2}\d"
+        okay_02 = has_match(rfc_1[1], r"[AEIOU]") or has_match(rfc_1[3], r"[0-9]")
+        # When second initial is not vowel, extreme case, and only three initals 
+        # are used, for which the 4th entry is a number. 
         try: 
             _ = dt.strptime(rfc_1[-9:-3], '%y%m%d')
-            okay_02 = True
+            okay_03 = True
         except ValueError:
-            okay_02 = False
+            okay_03 = False
         
-        okays[0] = has_match(rfc_1, reg_00) and okay_01 and okay_02
+        okays[0] = (has_match(rfc_1, regx_01) and okay_02 and okay_03)
 
         okays[1] = (len(rfc_1) == len(rfc_0) 
                 and cls.get_verificator(rfc_1[:-1], 'RFC') == rfc_1[-1])
 
         okays[2] = rfc_1[-3:-1] == rfc_0[-3:-1]
 
-        okays[3] = rfc_1[-9:-3] == rfc_0[-9:-3]
+        okays[3] = (rfc_1[-9:-3] == rfc_0[-9:-3] and okay_03)
 
         okays[4] = rfc_1[  :-9] == rfc_0[  :-9]
 
