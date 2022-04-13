@@ -40,7 +40,7 @@ async def person_physical_rfc(req_person: PersonPhysical):
     return engine.process_rfc_physical_2(req_person)
 
 
-@app.post("/rfc-validate/{rfc_user}/{rfc_calc}", tags=['ID keys'])
+@app.post("/rfc-validate", tags=['ID keys'])
 # async def validate_rfc_physical(rfc_user:str, rfc_calc:str):
 async def validate_rfc_physical(req_validation: RequestValidation):
     (rfc_user, rfc_calc) = (req_validation.userRFC, req_validation.calculatedRFC)
