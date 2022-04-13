@@ -19,7 +19,7 @@ def process_rfc_physical(an_input):
 
     except ValueError: 
         the_exception = HTTPException(status_code=400, 
-                detail='dateOfBirth: Incorrect data fromat, use YYYY-MM-DD')
+                detail="dateOfBirth: Incorrect data fromat, use YYYY-MM-DD")
         raise the_exception
     except Exception as expt: 
         raise HTTPException(status_code=500, detail=str(expt))
@@ -31,10 +31,19 @@ def process_rfc_physical_2(person):
         return {'rfc' : the_rfc}
     except ValueError: 
         the_exception = HTTPException(status_code=400, 
-                detail='dateOfBirth: Incorrect data fromat, use YYYY-MM-DD')
+                detail="dateOfBirth: Incorrect data fromat, use YYYY-MM-DD")
         raise the_exception
     except Exception as expt: 
         raise HTTPException(status_code=500, detail=str(expt))
+
+
+def validate_rfc_physical(rfc_user, rfc_engine): 
+    try: 
+        fails = PersonPhysical.validate_rfc(rfc_user, rfc_engine)
+        return {'failValidations': fails}
+    except Exception as expt: 
+        raise HTTPException(status_code=500, detail=str(expt))
+
 
 
 def process_curp(person_obj: PersonPhysical):
