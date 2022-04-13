@@ -2,8 +2,9 @@ import sys
 from fastapi import FastAPI
 from json import loads
 import uvicorn
+from typing import Optional
 
-from .models import ORJSONResponse, RequestRFC, OffensiveResponse
+from .models import RequestValidation, RequestRFC, OffensiveResponse, ORJSONResponse
 from src.get_rfc import PersonPhysical
 from src import engine
 from config import VERSION
@@ -27,7 +28,6 @@ async def root():
     return f"Uploaded, version: {VERSION}"
 
 
-
 # Este es el bueno. 
 @app.post("/curp", tags=['ID keys'])
 async def person_curp(req_person: PersonPhysical):    
@@ -40,9 +40,11 @@ async def person_physical_rfc(req_person: PersonPhysical):
     return engine.process_rfc_physical_2(req_person)
 
 
-@app.post("/rfc-validate/{rfc_user}/{rfc_calculation}", tags=['ID keys'])
-async def validate_rfc_physical(rfc_user:str, rfc_calculated:str):
-    return engine.validate_rfc(rfc_user, rfc_calculated)
+@app.post("/rfc-validate/{rfc_user}/{rfc_calc}", tags=['ID keys'])
+# async def validate_rfc_physical(rfc_user:str, rfc_calc:str):
+async def validate_rfc_physical(req_validation: RequestValidation):
+    (rfc_user, rfc_calc) = (req_validation.userRFC, req_validation.calculatedRFC)
+    return engine.validate_rfc_physical(rfc_user, rfc_calc)
 
 
 @app.get("/approve-alias/{alias}", tags=['Alias'], 

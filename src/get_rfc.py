@@ -99,6 +99,7 @@ class PersonPhysical(BaseModel):
     first_name         : str = Field(alias='firstName')
     last_name          : Optional[str] = Field(alias='lastName')
     maternal_last_name : Optional[str] = Field(alias='maternalLastName')
+    date_of_birth      : Optional[date] = Field(alias='dateOfBirth') 
     state_of_birth     : Optional[State] = Field(alias='stateOfBirth')
     gender             : Optional[Gender]
     # Construct with ALIAS, returns standard attribute. 
@@ -471,12 +472,13 @@ if __name__ == '__main__':
 
 
     # person_dict = {
-    #     'person_type': 'physical',
+    #     # 'person_type': 'physical',
     #     'names_list' : ['Villamil', 'Pesqueira', 'Diego'], 
     #     'date_of_birth' : date(1983, 12, 27), 
     #     'state_of_birth': 'Ciudad de México', 
     #     'gender' : 'H'
     # }
+    
     person_dict = {
         'firstName' : "Jose Marcos",
         'lastName' : "Ramirez", 

@@ -5,6 +5,10 @@ from orjson import dumps
 from src.get_rfc import PersonPhysical
 
 
+class RequestValidation(BaseModel): 
+    userRFC: str
+    calculatedRFC: str
+
 
 class RequestRFC(BaseModel): 
     personPhysical: PersonPhysical
