@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from fastapi.responses import JSONResponse
-from typing import Any, Optional
+from typing import Optional, ClassVar, Dict, Any
 from orjson import dumps
 from src.get_rfc import PersonPhysical
 
@@ -12,6 +12,30 @@ class RequestValidation(BaseModel):
 
 class RequestRFC(BaseModel): 
     personPhysical: PersonPhysical
+
+
+class InvalidRFCResponse(BaseModel): 
+    key: int
+    name: str
+    message: str
+
+    messages: ClassVar[Dict] = {
+        '-3': ('No reconocida', "Tu RFC no se puede determinar"),
+        '-2': ('Múltiples inconsistencias', "Tu RFC tiene errores, ingrésalo nuevamente"),
+        '-1': ('Sin inconsistencia', "Tu RFC es válido"), 
+        '0' : ('Formato', "El formato de tu RFC es incorrecto, ingrésalo nuevamente"), 
+        '1' : ('Dígito verificador', "El último dígito de tu RFC no corresponde, ingrésalo correctamente"), 
+        '2' : ('Homoclave', "La homoclave de tu RFC no coincide, ingrésala nuevamente"), 
+        '3' : ('Fecha de nacimiento', "La fecha de nacimiento de tu RFC no coincide, ingrésala nuevamente"), 
+        '4' : ('Iniciales', "Las iniciales de tu RFC no corresponden, ingrésalas nuevamente")}
+    
+    @classmethod
+    def from_key(cls, a_key): 
+        b_key = str(a_key) 
+        c_key = b_key if b_key in cls.messages else '-3'
+        c_msg = cls.messages[c_key] 
+        c_obj = cls(key=c_key, name=c_msg[0], message=c_msg[1])
+        return c_obj
 
 
 class OffensiveResponse(BaseModel): 

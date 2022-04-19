@@ -54,20 +54,22 @@ if False:
     import config
     reload(config)
     from config import URLS
+    from src.app.models import RequestValidation
 
     ENV = 'local'  # 'qa' # 'staging' # 
     URL = config.URLS[ENV]
 
-#    test_run = test_ids.RfcTestCase()
     example  = set_example()
 
-    # headers  = {
-    #     'grant_type': 'client_credentials',
-    #     'client_id': _env(), 'client_secret' : '', 'scope' : ''}
     person_dict = {
         'firstName': 'Diego', 'lastName': 'Villamil', 'maternalLastName': 'Pesqueira', 
         'dateOfBirth': '1983-12-27'
     }
     abc = requests.post(f'{URL}/rfc-ph', json=person_dict)
 
+    validate_dict = {'userRFC': 'VIPC831227DH3', 'calculatedRFC': 'VIPD831227DH2'}
 
+    abc = requests.post(f'{URL}/rfc-validate', json=validate_dict)
+    req_validation = RequestValidation(**validate_dict)
+    (rfc_user, rfc_engine) = (req_validation.userRFC, req_validation.calculatedRFC)
+    efg = engine.validate_rfc_physical(rfc_user, rfc_engine)

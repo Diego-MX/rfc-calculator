@@ -11,6 +11,7 @@ from pydantic import BaseModel, Field
 from src.utilities.basic import (compose_ls, arg0_to_end, 
     str_iconv, str_multisub)
 
+
 #%% Aux variables
 
 # These keys are defined in the corresponding documentation for RFC and CURP.
@@ -34,7 +35,7 @@ INCONVENIENTS = {
         "COJO, CULO, FETO, GUEY, JOTO, KACA, KACO, KAGA, KAGO, KOGE, KOJO, " + 
         "KAKA, KULO, MAME, MAMO, MEAR, MEON, MION, MOCO, MULA, PEDA, PEDO, " + 
         "PENE, PUTA, PUTO, QULO, RATA, RUIN"
-        ).split(", "),   # 38 words
+        ).split(', '),   # 38 words
     'CURP':  ("BACA, BAKA, BUEI, BUEY, CACA, CACO, CAGA, CAGO, CAKA, CAKO, " +  
         "COGE, COGI, COJA, COJE, COJI, COJO, COLA, CULO, FALO, FETO, GETA, " +  
         "GUEI, GUEY, JETA, JOTO, KACA, KACO, KAGA, KAGO, KAKA, KAKO, KOGE, " +  
@@ -46,14 +47,14 @@ INCONVENIENTS = {
         ).split(', ') }  # 81 words
 
 IGNORE_WORDS = {
-    "RFC": ("EL, LA, DE, S DE RL, SA DE CV, DE, LOS, LAS, Y, MC, DEL, SA, " + 
+    'RFC': ("EL, LA, DE, S DE RL, SA DE CV, DE, LOS, LAS, Y, MC, DEL, SA, " + 
         "COMPAÑIA, CIA, SOCIEDAD, SOC, COOPERATIVA, COOP, S EN C POR A, " + 
         "A EN P, MAC, S EN NC, S EN C, VAN, PARA, EN, MI, POR, CON, AL, SUS, " +
         "E, SC, SCL, SCS, SNC, THE, OF, AND, COMPANY, CO, MC, MI, A, SRL CV, " + 
         "SA DE CV MI, SA MI, COMPA.IA, SRL CV MI, SRL MI"
         ).split(', '), 
-    'CURP' : ('DA, DAS, DE, DEL, DER, DI, DIE, DD, EL, LA, LOS, LAS, LE, ' + 
-        'LES, MAC, MC, VAN, VON, Y'
+    'CURP' : ("DA, DAS, DE, DEL, DER, DI, DIE, DD, EL, LA, LOS, LAS, LE, " + 
+        "LES, MAC, MC, VAN, VON, Y"
         ).split(', ') }
 
 IGNORE_CHARS = {
@@ -83,6 +84,15 @@ str_normalize = partial(arg0_to_end(str_iconv), 'ÁÉÍÓÚÜ', 'AEIOUU')
 str_spacing = compose_ls([partial(re.sub, ' +', ' '), str.strip])
 
 has_match = lambda a_str, a_reg: re.match(a_reg, a_str) is not None
+
+def valid_datestring(a_str:str, format='%y%m%d') -> bool: 
+
+    try: 
+        _date = dt.strptime(a_str[-9:-3], format)
+        is_it = True
+    except ValueError:
+        is_it = False
+    return is_it 
 
 
 
@@ -270,40 +280,27 @@ class PersonPhysical(BaseModel):
     def validate_rfc(cls, rfc_1: str, rfc_0: str): 
         rfc_1 = rfc_1.upper()
         rfc_0 = rfc_0.upper()
-        
-        the_inconsistencies = {
-            '0': ("Format", "String doesn't have RFC format."), 
-            '1': ("Verification Digit", "Verification digit is not valid."), 
-            '2': ("Homonymial Keys", "Mismatch on homonymial keys, verify names."), 
-            '3': ("Date of birth", "Date of birth doesn't match or not valid."), 
-            '4': ("Name initials", "Mismatch on name initials, verify rules.")}
-        okays = [False] * 5
 
+        okays = [False]*5
 
-        regx_01 = r"[A-Z]{3,4}\d{6}[A-Z\d]{2}\d"
+        # For OKAY_02, an infrequent case when second initial is not vowel,
+        # it must be that there are only 3 initials, hence the fourth character is a 0-9 digit. 
+        okay_01 = has_match(rfc_1, r"[A-Z]{3,4}\d{6}[A-Z\d]{2}\d")
         okay_02 = has_match(rfc_1[1], r"[AEIOU]") or has_match(rfc_1[3], r"[0-9]")
-        # When second initial is not vowel, extreme case, and only three initals 
-        # are used, for which the 4th entry is a number. 
-        try: 
-            _ = dt.strptime(rfc_1[-9:-3], '%y%m%d')
-            okay_03 = True
-        except ValueError:
-            okay_03 = False
+        okay_03 = valid_datestring(rfc_1[-9:-3])
         
-        okays[0] = (has_match(rfc_1, regx_01) and okay_02 and okay_03)
-
+        # Format
+        okays[0] = (okay_01 and okay_02 and okay_03)
+        # Verification Digit
         okays[1] = (len(rfc_1) == len(rfc_0) 
                 and cls.get_verificator(rfc_1[:-1], 'RFC') == rfc_1[-1])
-
-        okays[2] = rfc_1[-3:-1] == rfc_0[-3:-1]
-
+        # Homonymial Keys
+        okays[2] = (rfc_1[-3:-1] == rfc_0[-3:-1])
+        # Date of Birdth
         okays[3] = (rfc_1[-9:-3] == rfc_0[-9:-3] and okay_03)
-
-        okays[4] = rfc_1[  :-9] == rfc_0[  :-9]
-
-        verify_fails = {k: v for (k, v) in the_inconsistencies.items() 
-                if not okays[int(k)] }
-        return verify_fails
+        # Initials
+        okays[4] = (rfc_1[  :-9] == rfc_0[  :-9])
+        return okays
 
 
 

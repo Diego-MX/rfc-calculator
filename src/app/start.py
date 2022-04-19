@@ -4,7 +4,8 @@ from json import loads
 import uvicorn
 
 
-from .models import RequestValidation, RequestRFC, OffensiveResponse, ORJSONResponse
+from .models import (RequestValidation, RequestRFC, 
+        OffensiveResponse, ORJSONResponse)
 from src.get_rfc import PersonPhysical
 from src import engine
 from config import VERSION

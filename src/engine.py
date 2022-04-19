@@ -1,12 +1,26 @@
+from email.policy import HTTP
 import re
 from operator import itemgetter
 from datetime import datetime as dt
 import pandas as pd
 from fastapi.exceptions import HTTPException
 
-from src.get_rfc import rfc_completo, PersonPhysical
 from src.utilities.basic import str_delatinize
+from src.get_rfc import rfc_completo, PersonPhysical
+from src.app.models import InvalidRFCResponse
 
+#%% Some helper functions
+
+def first_true(a_list:list, from_end=False): 
+    b_list = a_list.copy()
+    if from_end: 
+        b_list = b_list.reverse()
+    trues = [ii for x, ii in enumerate(a_list) if x]
+    a_first = trues[0] if trues else None
+    return a_first
+
+
+#%% The calls. 
 
 def process_rfc_physical(an_input): 
     try: 
@@ -39,11 +53,24 @@ def process_rfc_physical_2(person):
 
 def validate_rfc_physical(rfc_user, rfc_engine): 
     try: 
-        fails = PersonPhysical.validate_rfc(rfc_user, rfc_engine)
-        return {'failValidations': fails}
+        fail_keys = [not ok for ok in PersonPhysical.validate_rfc(rfc_user, rfc_engine)]
+
+        if sum(fail_keys) == 0: 
+            an_obj = InvalidRFCResponse.from_key(-1)
+            status = 200
+        elif sum(fail_keys) == 1:
+            an_obj = InvalidRFCResponse.from_key(fail_keys[0])
+            status = 409
+        elif sum(fail_keys) > 1:
+            an_obj = InvalidRFCResponse.from_key(-2)
+            status = 409
     except Exception as expt: 
         raise HTTPException(status_code=500, detail=str(expt))
-
+    
+    if status == 200: 
+        return an_obj
+    else: 
+        raise HTTPException(status, an_obj.json())
 
 
 def process_curp(person_obj: PersonPhysical):
