@@ -14,7 +14,7 @@ class RequestRFC(BaseModel):
     personPhysical: PersonPhysical
 
 
-class InvalidRFCResponse(BaseModel): 
+class RFCValidationResponse(BaseModel): 
     key: int
     name: str
     message: str
