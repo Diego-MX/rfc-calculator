@@ -45,21 +45,10 @@ def validate_rfc_physical(req_validation, response:Response):
         rfc_user = req_validation.userRFC
         rfc_engine = req_validation.calculatedRFC
         fail_keys = [not ok for ok in PersonPhysical.validate_rfc(rfc_user, rfc_engine)]
-        k_fails = sum(fail_keys)
-
-        if k_fails == 0: 
-            index = -1
-        elif k_fails == 1: 
-            index = [i for (i, x) in enumerate(fail_keys) if x][0]
-            # compress(range(len(fail_keys)), fail_keys)[0]
-            # compress(*zip(*enumerate(fail_keys)))[0]
-        elif k_fails > 1: 
-            index = -2
-        else: 
-            index = -3
-
+        
+        index = -1 if sum(fail_keys) == 0 else -2
         an_obj = RFCValidationResponse.from_key(index)
-        if k_fails > 0:
+        if sum(fail_keys) > 0: 
             response.status_code = status.HTTP_409_CONFLICT
         return an_obj
 

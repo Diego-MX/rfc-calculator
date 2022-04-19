@@ -8,7 +8,7 @@ on:
 env:
   WAP_SERV : as-validationServices-data-qas
   DKR_IMAGE: data-functions-wap-qas
-  DKR_TAG  : "1.0.21"
+  DKR_TAG  : "1.0.22"
    
     
 jobs:
