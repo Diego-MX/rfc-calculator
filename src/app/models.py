@@ -14,15 +14,15 @@ class RequestRFC(BaseModel):
     personPhysical: PersonPhysical
 
 
-class InvalidRFCResponse(BaseModel): 
+class RFCValidationResponse(BaseModel): 
     key: int
     name: str
     message: str
 
     messages: ClassVar[Dict] = {
-        '-3': ('No reconocida', "Tu RFC no se puede determinar"),
-        '-2': ('Múltiples inconsistencias', "Tu RFC tiene errores, ingrésalo nuevamente"),
-        '-1': ('Sin inconsistencia', "Tu RFC es válido"), 
+        '-3': ('Error no reconocido', "Tu RFC no se puede determinar"),
+        '-2': ('RFC Inválido', "Tu RFC tiene errores, ingrésalo nuevamente"),
+        '-1': ('RFC Válido', "Tu RFC es válido"), 
         '0' : ('Formato', "El formato de tu RFC es incorrecto, ingrésalo nuevamente"), 
         '1' : ('Dígito verificador', "El último dígito de tu RFC no corresponde, ingrésalo correctamente"), 
         '2' : ('Homoclave', "La homoclave de tu RFC no coincide, ingrésala nuevamente"), 

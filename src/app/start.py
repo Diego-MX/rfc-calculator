@@ -1,11 +1,11 @@
 import sys
-from fastapi import FastAPI
+from fastapi import FastAPI, Response
 from json import loads
 import uvicorn
 
 
 from .models import (RequestValidation, RequestRFC, 
-        OffensiveResponse, ORJSONResponse)
+        OffensiveResponse, RFCValidationResponse, ORJSONResponse)
 from src.get_rfc import PersonPhysical
 from src import engine
 from config import VERSION
@@ -41,11 +41,10 @@ async def person_physical_rfc(req_person: PersonPhysical):
     return engine.process_rfc_physical_2(req_person)
 
 
-@app.post("/rfc-validate", tags=['ID keys'])
-# async def validate_rfc_physical(rfc_user:str, rfc_calc:str):
-async def validate_rfc_physical(req_validation: RequestValidation):
-    (rfc_user, rfc_calc) = (req_validation.userRFC, req_validation.calculatedRFC)
-    return engine.validate_rfc_physical(rfc_user, rfc_calc)
+@app.post("/rfc-validate", tags=['ID keys'], 
+        response_model=RFCValidationResponse)
+async def validate_rfc_physical(req_validation: RequestValidation, response: Response):
+    return engine.validate_rfc_physical(req_validation, response)
 
 
 @app.get("/approve-alias/{alias}", tags=['Alias'], 

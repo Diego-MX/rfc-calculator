@@ -49,6 +49,8 @@ if __name__ == '__main__':
 
 
 if False: 
+    from src import engine
+    import requests
     from importlib import reload
     from tests import test_ids
     import config
