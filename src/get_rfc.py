@@ -85,10 +85,9 @@ str_spacing = compose_ls([partial(re.sub, ' +', ' '), str.strip])
 
 has_match = lambda a_str, a_reg: re.match(a_reg, a_str) is not None
 
-def valid_datestring(a_str:str, format='%y%m%d') -> bool: 
-
+def valid_datestring(dt_str:str, format='%y%m%d') -> bool: 
     try: 
-        _date = dt.strptime(a_str[-9:-3], format)
+        _date = dt.strptime(dt_str, format)
         is_it = True
     except ValueError:
         is_it = False

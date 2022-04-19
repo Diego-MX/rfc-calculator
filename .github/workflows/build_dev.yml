@@ -10,7 +10,7 @@ env:
   ACR_HOST : datalakeepiccontainerregistry.azurecr.io
   ACR_USER : DatalakeEpicContainerRegistry
   DKR_IMAGE: data-functions-wap-dev
-  DKR_TAG  : '1.0.19'
+  DKR_TAG  : '1.0.20'
    
     
 jobs:
