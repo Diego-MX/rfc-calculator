@@ -31,8 +31,8 @@ jobs:
       with: 
         dockerfile: dockerfile.ci
         image     : ${{ env.DKR_IMAGE }}
-        registry  : ${{ env.ACR_HOST }}
         tags      : ${{ env.DKR_TAG }}
+        registry  : ${{ env.ACR_HOST }}
         username  : ${{ env.ACR_USER }}
         password  : ${{ secrets.ACR_PASS }}
         
