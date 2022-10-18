@@ -18,8 +18,6 @@ from src.utilities.basic import (compose_ls, arg0_to_end,
 # Spaces and tildes are used as place-holders on purpose. 
 
 # RFC
-#%% 
-
 CHARS_1 = ' 123456789&ABCDEFGHI~JKLMNOPQR~~STUVWXYZÑ' 
 CHARS_2 = '123456789ABCDEFGHIJKLMNPQRSTUVWXYZ'
 CHARS_3 = '0123456789ABCDEFGHIJKLMN&OPQRSTUVWXYZ Ñ'  
@@ -62,9 +60,10 @@ IGNORE_CHARS = {
     'CURP'  : '/-.', 
     'moral' : '@"´%#!.$\'-/+()'}
 
-NAZARENOS = ['MARIA', 'JOSE', 'MA', 'MAXX']  # Last is equivalent to 'MA.', 
-                                             # although modified by the rules. 
+NAZARENES = ['MARIA', 'JOSE', 'MA', 'MAXX']  # Last entry MAXX is used for MA, 
+    # when modified with some rules. 
 
+# These codes assume the Mexican State name. 
 states_str = ("Aguascalientes:AS, Baja California:BC, Baja California Sur:BS, " + 
     "Campeche:CC, Chiapas:CS, Chihuahua:CH, Ciudad de México:DF, Coahuila:CL, " + 
     "Colima:CM, Durango:DG, Guanajuato:GT, Guerrero:GR, Hidalgo:HG, Jalisco:JC, " + 
@@ -75,9 +74,10 @@ states_str = ("Aguascalientes:AS, Baja California:BC, Baja California Sur:BS, " 
 states_dict = dict(state.split(':') for state in states_str.split(', '))
 states_inv  = {abr: name for (name, abr) in states_dict.items()}
 State = Enum('State', states_inv)
+# Still understanding the use of ENUM type
 
-#%% 
 
+# And now some auxiliary functions. 
 compose_apply = lambda x, fn_ls: list(map(compose_ls(fn_ls), x))
 
 str_normalize = partial(arg0_to_end(str_iconv), 'ÁÉÍÓÚÜ', 'AEIOUU')
@@ -86,6 +86,7 @@ str_spacing = compose_ls([partial(re.sub, ' +', ' '), str.strip])
 has_match = lambda a_str, a_reg: re.match(a_reg, a_str) is not None
 
 def valid_datestring(dt_str:str, format='%y%m%d') -> bool: 
+    # Not the most elegant way ... but who cares about elegance these days. 
     try: 
         _date = dt.strptime(dt_str, format)
         is_it = True
@@ -95,15 +96,16 @@ def valid_datestring(dt_str:str, format='%y%m%d') -> bool:
 
 
 
-#%%
+#%% The Real Models.  
 
 class Gender(str, Enum): 
+    # Also not sure if this is entirely correct. 
     HOMBRE = 'H'
     MUJER = 'M'
 
 
 class PersonPhysical(BaseModel): 
-    # Needs to use alias to import into APP.MODELS
+    # Alias is for use when used with other APP. 
     # person_type      : Literal['Physical']
     first_name         : str = Field(alias='firstName')
     last_name          : Optional[str] = Field(alias='lastName')
@@ -136,7 +138,6 @@ class PersonPhysical(BaseModel):
 
 
     def get_helpers(self, mode):
-
         sub_chars = {'RFC': '', 'CURP': 'XX'} 
         
         dict_chars = dict((c_char, sub_chars[mode]) for c_char in IGNORE_CHARS[mode])
@@ -153,15 +154,15 @@ class PersonPhysical(BaseModel):
 
 
         firstnames_ls = names_2[2].split(' ')
-        use_first = (len(firstnames_ls) == 1) | (firstnames_ls[0] not in NAZARENOS)
+        use_first     = (len(firstnames_ls) == 1) | (firstnames_ls[0] not in NAZARENES)
         one_firstname = firstnames_ls[0] if use_first else firstnames_ls[1]
 
         lastnames = names_2[:2]        
         if mode == 'CURP':  # Compound last names use only the first one. 
-            lastnames = [e_name.split(' ')[0] for e_name in lastnames]
+            lastnames = [each_name.split(' ')[0] for each_name in lastnames]
             names_2[:2] = lastnames
 
-        use_one = '' in lastnames
+        use_one      = '' in lastnames
         one_lastname = ''.join(lastnames) if (use_one) else None
         two_lastname = one_lastname if one_lastname else names_2[0]
 
@@ -184,6 +185,7 @@ class PersonPhysical(BaseModel):
         
         params = { 'RFC' : ('AEIOU' , 3), 
                    'CURP': ('AEIOUX', 1) }
+                   
         (vowels, pos) = params[mode]
         
         if mode == 'RFC':
@@ -277,8 +279,8 @@ class PersonPhysical(BaseModel):
 
     @classmethod
     def validate_rfc(cls, rfc_1: str, rfc_0: str): 
-        rfc_1 = rfc_1.upper()
-        rfc_0 = rfc_0.upper()
+        rfc_1 = rfc_1.upper()  # USER
+        rfc_0 = rfc_0.upper()  # CALCULATED
 
         okays = [False]*5
 
@@ -286,7 +288,7 @@ class PersonPhysical(BaseModel):
         # it must be that there are only 3 initials, hence the fourth character is a 0-9 digit. 
         okay_01 = has_match(rfc_1, r"[A-Z]{3,4}\d{6}[A-Z\d]{2}\d")
         okay_02 = has_match(rfc_1[1], r"[AEIOU]") or has_match(rfc_1[3], r"[0-9]")
-        okay_03 = valid_datestring(rfc_1[-9:-3])
+        okay_03 = valid_datestring(rfc_1[-9:-3]) 
         
         # Format
         okays[0] = (okay_01 and okay_02 and okay_03)
@@ -337,7 +339,7 @@ class PersonaFisica:
 
         lastnames = the_list[:2]
         the_names = the_list[ 2].split(' ')
-        use_first = (len(the_names) == 1) | (the_names[0] not in NAZARENOS)
+        use_first = (len(the_names) == 1) | (the_names[0] not in NAZARENES)
         
         self.apellido_p = the_list[0]
         self.apellido_m = the_list[1]
@@ -476,11 +478,11 @@ if __name__ == '__main__':
     # }
     
     person_dict = {
-        'firstName' : "Jose Marcos",
-        'lastName' : "Ramirez", 
-        'maternalLastName': "Miguel", 
-        'dateOfBirth' : date(1963, 2, 12), 
-        'stateOfBirth': 'Ciudad de México', 
+        'firstName' : "Alejandra Jimena",
+        'lastName' : "Rodriguez", 
+        'maternalLastName': "Ruiz", 
+        'dateOfBirth' : date(1985, 6, 14), 
+        'stateOfBirth': 'Nuevo León', 
         'gender' : 'H'
     }
     
