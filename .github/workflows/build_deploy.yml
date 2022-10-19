@@ -61,15 +61,15 @@ jobs :
         dockerfile : dockerfile.ci
         image      : ${{env.DKR_IMAGE}}
         tags       : ${{env.DKR_TAG}}
-        registry   : ${{needs.init.outputs.reg-user}}.azurecr.io
-        username   : ${{secrets.ACR_USER}}
+        username   : ${{needs.init.outputs.reg-user}}
         password   : ${{secrets.ACR_PASS}}
-        
+        registry  : '${{needs.init.outputs.reg-user}}.azurecr.io'
+        buildArgs : 'SERVER_TYPE=wap,ENV_TYPE=${{needs.init.outputs.environment}}'  
         
     - name : Deploy to App Service
       uses : azure/webapps-deploy@v2
       with :
-        app-name       : ${{needs.init.outputs.app-name}}
-        images         : ${{needs.init.outputs.reg-user}}/${{env.DKR_IMAGE}}:${{env.DKR_TAG}}
-        publish-profile: ${{secrets.WAP_PUBLISH}}
+        app-name        : ${{needs.init.outputs.app-name}}
+        images          : ${{needs.init.outputs.reg-user}}/${{env.DKR_IMAGE}}:${{env.DKR_TAG}}
+        publish-profile : ${{secrets.WAP_PUBLISH}}
        
