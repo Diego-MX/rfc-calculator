@@ -1,4 +1,4 @@
-name: Build Dev
+name: Build and Deploy 
 
 on: 
   push:
@@ -7,9 +7,10 @@ on:
       - qas
 
 env:
-  ACR_USER : DatalakeEpicContainerRegistry
-  DKR_IMAGE: data-functions-wap-dev
-  DKR_TAG  : '1.0.23'
+  GH_REPO   : Bineo2/data-functions
+  ACR_USER  : DatalakeEpicContainerRegistry
+  DKR_IMAGE : data-functions-wap
+  DKR_TAG   : '1.0.23'
    
     
 jobs :
@@ -17,7 +18,7 @@ jobs :
     runs-on : ubuntu-latest
     outputs : 
       env-branch : ${{steps.set-variables.outputs.env-branch}}
-      registry   : ${{steps.set-variables.outputs.registry}}
+      reg-user   : ${{steps.set-variables.outputs.reg-user}}
       app-name   : ${{steps.set-variables.outputs.app-name}}
 
     steps : 
@@ -27,22 +28,22 @@ jobs :
           case ${GITHUB_BASE_REF##*/} in
             "dev") 
               echo "::set-output name=env-branch::dev"
-              echo "::set-output name=registry::datalakeepiccontainerregistry.azurecr.io"
+              echo "::set-output name=reg-user::datalakeepiccontainerregistry"
               echo "::set-output name=app-name::wap-validation-services-dev"
               ;;
             "qas")
               echo "::set-output name=env-branch::qas"
-              echo "::set-output name=registry::acrCrossChannelDataQas.azurecr.io"
+              echo "::set-output name=reg-user::acrCrossChannelDataQas"
               echo "::set-output app-name::as-validationServices-data-qas"
               ;;
             "stg")
               echo "::set-output name=env-branch::stg"
-              echo "::set-output name=registry::acrCrossChannelDataStg.azurecr.io"
+              echo "::set-output name=reg-user::acrCrossChannelDataQas"
               echo "::set-output name=app-name::as-validationServices-data-stg"
               ;;
           esac 
   
-  build-and-deploy-dev :
+  build-and-deploy :
     runs-on     : ubuntu-latest
     needs       : init
     environment : ${{needs.init.outputs.env-brach}} 
@@ -51,7 +52,8 @@ jobs :
     - name : Checkout GitHub Actions
       uses : actions/checkout@main
       with :
-        ref : ${{needs.init.outputs.env-branch}}
+        repository : ${{env.GH_REPO}}
+        ref        : ${{needs.init.outputs.env-branch}}
      
     - name : Build and push to registry 
       id   : container-registry
@@ -60,8 +62,8 @@ jobs :
         dockerfile : dockerfile.ci
         image      : ${{env.DKR_IMAGE}}
         tags       : ${{env.DKR_TAG}}
-        registry   : ${{needs.init.outputs.registry}}
-        username   : ${{env.ACR_USER}}
+        registry   : ${{needs.init.outputs.reg-user}}.azurecr.io
+        username   : ${{secrets.ACR_USER}}
         password   : ${{secrets.ACR_PASS}}
         
         
@@ -69,6 +71,6 @@ jobs :
       uses : azure/webapps-deploy@v2
       with :
         app-name       : ${{needs.init.outputs.app-name}}
-        images         : ${{needs.init.outputs.registry}}/${{env.DKR_IMAGE}}:${{env.DKR_TAG}}
+        images         : ${{needs.init.outputs.reg-user}}/${{env.DKR_IMAGE}}:${{env.DKR_TAG}}
         publish-profile: ${{secrets.WAP_PUBLISH}}
        
