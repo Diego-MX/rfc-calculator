@@ -8,7 +8,6 @@ on:
 
 env:
   GH_REPO   : Bineo2/data-functions
-  ACR_USER  : DatalakeEpicContainerRegistry
   DKR_IMAGE : data-functions-wap
   DKR_TAG   : '1.0.23'
    
