@@ -5,11 +5,12 @@ on:
     branches: 
       - dev
       - qas
+      - stg
 
 env:
   GH_REPO   : Bineo2/data-functions
   DKR_IMAGE : data-functions-wap
-  DKR_TAG   : '1.0.23'
+  DKR_TAG   : '1.0.25'
    
     
 jobs :
@@ -61,10 +62,10 @@ jobs :
         dockerfile : dockerfile.ci
         image      : ${{env.DKR_IMAGE}}
         tags       : ${{env.DKR_TAG}}
-        username   : ${{needs.init.outputs.reg-user}}
         password   : ${{secrets.ACR_PASS}}
+        username   : ${{needs.init.outputs.reg-user}}
         registry  : '${{needs.init.outputs.reg-user}}.azurecr.io'
-        buildArgs : 'SERVER_TYPE=wap,ENV_TYPE=${{needs.init.outputs.environment}}'  
+        buildArgs : 'SERVER_TYPE=wap,ENV_TYPE=${{needs.init.outputs.env-branch}}'  
         
     - name : Deploy to App Service
       uses : azure/webapps-deploy@v2
