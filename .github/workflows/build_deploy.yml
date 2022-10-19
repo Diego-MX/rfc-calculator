@@ -34,7 +34,7 @@ jobs :
             "qas")
               echo "::set-output name=env-branch::qas"
               echo "::set-output name=reg-user::acrCrossChannelDataQas"
-              echo "::set-output app-name::as-validationServices-data-qas"
+              echo "::set-output name=app-name::as-validationServices-data-qas"
               ;;
             "stg")
               echo "::set-output name=env-branch::stg"
