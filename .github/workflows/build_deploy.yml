@@ -1,7 +1,7 @@
 name : Build and Deploy 
 
 on : 
-  push :
+  pull_request :
     branches : ['dev', 'qas', 'stg', 'prd']
 
 
@@ -14,7 +14,7 @@ jobs :
   init :
     runs-on : ubuntu-latest
     outputs : 
-      app-name   : ${{steps.set-variables.outputs.app-name}}
+      app-name : ${{steps.set-variables.outputs.app-name}}
 
     steps : 
       - name : Set Variables
@@ -42,7 +42,7 @@ jobs :
       uses : actions/checkout@main
       with :
         repository : ${{env.GH_REPO}}
-        ref        : ${{github.base_ref}}
+        ref        : ${{github.ref_name}}
      
     - name : Build and push to registry 
       id   : container-registry
@@ -54,7 +54,7 @@ jobs :
         dockerfile : dockerfile.ci
         image      : ${{env.DKR_IMAGE}}
         tags       : ${{env.DKR_TAG}}
-        buildArgs  : ENV_TYPE=${{github.base_ref}},SERVER_TYPE=wap
+        buildArgs  : ENV_TYPE=${{github.ref_name}},SERVER_TYPE=wap
         
     - name : Deploy to App Service
       uses : azure/webapps-deploy@v2
