@@ -42,7 +42,7 @@ jobs :
       uses : actions/checkout@main
       with :
         repository : ${{env.GH_REPO}}
-        ref        : ${{github.ref_name}}
+        ref        : ${{github.base_ref}}
      
     - name : Build and push to registry 
       id   : container-registry
@@ -54,7 +54,7 @@ jobs :
         dockerfile : dockerfile.ci
         image      : ${{env.DKR_IMAGE}}
         tags       : ${{env.DKR_TAG}}
-        buildArgs  : ENV_TYPE=${{github.ref_name}},SERVER_TYPE=wap
+        buildArgs  : ENV_TYPE=${{github.base_ref}},SERVER_TYPE=wap
         
     - name : Deploy to App Service
       uses : azure/webapps-deploy@v2
