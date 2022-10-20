@@ -1,0 +1,67 @@
+name : Build and Deploy 
+
+on : 
+  pull_request :
+    branches : ['dev', 'qas', 'stg', 'prd']
+
+
+env :
+  GH_REPO   : Bineo2/data-functions
+  DKR_IMAGE : data-functions-wap
+  DKR_TAG   : '1.0.27'
+
+
+jobs :
+  init :
+    runs-on : ubuntu-latest
+    outputs : 
+      app-name : ${{steps.set-variables.outputs.app-name}}
+
+    steps : 
+      - name : Set Variables
+        id   : set-variables
+        run  : |
+          case "${{github.base_ref}}" in
+            "dev") 
+              echo "::set-output name=app-name::wap-validation-services-dev"
+              ;;
+            "qas")
+              echo "::set-output name=app-name::as-validationServices-data-qas"
+              ;;
+            "stg")
+              echo "::set-output name=app-name::as-validationServices-data-stg"
+              ;;
+          esac 
+  
+  build-and-deploy :
+    needs       : init
+    runs-on     : ubuntu-latest
+    environment : ${{github.base_ref}} 
+    
+    steps :
+    - name : Checkout GitHub Actions
+      uses : actions/checkout@main
+      with :
+        repository : ${{env.GH_REPO}}
+        ref        : ${{github.base_ref}}
+     
+    - name : Build and push to registry 
+      id   : container-registry
+      uses : mr-smithers-excellent/docker-build-push@v5.5
+      with : 
+        ref        : ${{github.base_ref}}
+        registry   : ${{secrets.ACR_USERNAME}}.azurecr.io
+        username   : ${{secrets.ACR_USERNAME}}
+        password   : ${{secrets.ACR_PASSWORD}}
+        dockerfile : dockerfile.ci
+        image      : ${{env.DKR_IMAGE}}
+        tags       : ${{env.DKR_TAG}}
+        buildArgs  : ENV_TYPE=${{github.base_ref}},SERVER_TYPE=wap
+        
+    - name : Deploy to App Service
+      uses : azure/webapps-deploy@v2
+      with :
+        images   : ${{secrets.ACR_USERNAME}}.azurecr.io/${{env.DKR_IMAGE}}:${{env.DKR_TAG}}
+        app-name : ${{needs.init.outputs.app-name}}
+        publish-profile : ${{secrets.WAP_PUBLISH}}
+       
