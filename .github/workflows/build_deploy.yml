@@ -1,14 +1,14 @@
 name : Build and Deploy 
 
 on : 
-  pull_request :
+  push :
     branches : ['dev', 'qas', 'stg', 'prd']
 
 
 env :
   GH_REPO   : Bineo2/data-functions
   DKR_IMAGE : data-functions-wap
-  DKR_TAG   : '1.0.26'
+  DKR_TAG   : '1.0.27'
     
 jobs :
   init :
@@ -21,7 +21,7 @@ jobs :
       - name : Set Variables
         id   : set-variables
         run  : |
-          case ${GITHUB_BASE_REF} in
+          case ${GITHUB_REF##*/} in
             "dev") 
               echo "::set-output name=env-branch::dev"
               echo "::set-output name=app-name::wap-validation-services-dev"
@@ -52,9 +52,9 @@ jobs :
       id   : container-registry
       uses : mr-smithers-excellent/docker-build-push@v5.5
       with : 
-        registry   : ${{secrets.ACR_USER}}.azurecr.io
-        username   : ${{secrets.ACR_USER}}
-        password   : ${{secrets.ACR_PASS}}
+        registry   : ${{secrets.ACR_USERNAME}}.azurecr.io
+        username   : ${{secrets.ACR_USERNAME}}
+        password   : ${{secrets.ACR_PASSWORD}}
         dockerfile : dockerfile.ci
         image      : ${{env.DKR_IMAGE}}
         tags       : ${{env.DKR_TAG}}
@@ -63,7 +63,7 @@ jobs :
     - name : Deploy to App Service
       uses : azure/webapps-deploy@v2
       with :
-        images   : ${{secrets.ACR_USER}}.azurecr.io/${{env.DKR_IMAGE}}:${{env.DKR_TAG}}
+        images   : ${{secrets.ACR_USERNAME}}.azurecr.io/${{env.DKR_IMAGE}}:${{env.DKR_TAG}}
         app-name : ${{needs.init.outputs.app-name}}
         publish-profile : ${{secrets.WAP_PUBLISH}}
        
