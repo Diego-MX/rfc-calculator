@@ -8,7 +8,7 @@ on :
 env :
   GH_REPO   : Bineo2/data-functions
   DKR_IMAGE : data-functions-wap
-  DKR_TAG   : '1.0.25'
+  DKR_TAG   : '1.0.26'
     
 jobs :
   init :
