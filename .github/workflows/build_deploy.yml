@@ -9,7 +9,8 @@ env :
   GH_REPO   : Bineo2/data-functions
   DKR_IMAGE : data-functions-wap
   DKR_TAG   : '1.0.27'
-    
+
+
 jobs :
   init :
     runs-on : ubuntu-latest
@@ -35,7 +36,7 @@ jobs :
   build-and-deploy :
     needs       : init
     runs-on     : ubuntu-latest
-    environment : ${{needs.init.outputs.env-brach}} 
+    environment : ${{github.base_ref}} 
     
     steps :
     - name : Checkout GitHub Actions
@@ -48,6 +49,7 @@ jobs :
       id   : container-registry
       uses : mr-smithers-excellent/docker-build-push@v5.5
       with : 
+        ref        : ${{github.base_ref}}
         registry   : ${{secrets.ACR_USERNAME}}.azurecr.io
         username   : ${{secrets.ACR_USERNAME}}
         password   : ${{secrets.ACR_PASSWORD}}
