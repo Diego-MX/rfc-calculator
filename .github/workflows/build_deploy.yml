@@ -20,7 +20,7 @@ jobs :
       - name : Set Variables
         id   : set-variables
         run  : |
-          case "${{github.ref_name}}" in
+          case "${{github.base_ref}}" in
             "dev") 
               echo "::set-output name=app-name::wap-validation-services-dev"
               ;;
