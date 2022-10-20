@@ -14,24 +14,20 @@ jobs :
   init :
     runs-on : ubuntu-latest
     outputs : 
-      env-branch : ${{steps.set-variables.outputs.env-branch}}
       app-name   : ${{steps.set-variables.outputs.app-name}}
 
     steps : 
       - name : Set Variables
         id   : set-variables
         run  : |
-          case ${{github.base_ref}} in
+          case "${{github.base_ref}}" in
             "dev") 
-              echo "::set-output name=env-branch::dev"
               echo "::set-output name=app-name::wap-validation-services-dev"
               ;;
             "qas")
-              echo "::set-output name=env-branch::qas"
               echo "::set-output name=app-name::as-validationServices-data-qas"
               ;;
             "stg")
-              echo "::set-output name=env-branch::stg"
               echo "::set-output name=app-name::as-validationServices-data-stg"
               ;;
           esac 
@@ -46,7 +42,7 @@ jobs :
       uses : actions/checkout@main
       with :
         repository : ${{env.GH_REPO}}
-        ref        : ${{needs.init.outputs.env-branch}}
+        ref        : ${{github.base_ref}}
      
     - name : Build and push to registry 
       id   : container-registry
@@ -58,7 +54,7 @@ jobs :
         dockerfile : dockerfile.ci
         image      : ${{env.DKR_IMAGE}}
         tags       : ${{env.DKR_TAG}}
-        buildArgs  : SERVER_TYPE=wap,ENV_TYPE=${{needs.init.outputs.env-branch}}
+        buildArgs  : ENV_TYPE=${{github.base_ref}},SERVER_TYPE=wap
         
     - name : Deploy to App Service
       uses : azure/webapps-deploy@v2
