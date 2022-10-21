@@ -29,7 +29,7 @@ jobs :
               echo "::set-output name=app-name::as-validationServices-data-qas"
               ;;
             "stg")
-              echo "::set-output name=app-name::as-validationServices-data-stg"
+              echo "::set-output name=app-name::as-validationServices-adm-stg"
               ;;
           esac 
   
@@ -49,7 +49,6 @@ jobs :
       id   : container-registry
       uses : mr-smithers-excellent/docker-build-push@v5.5
       with : 
-        ref        : ${{github.base_ref}}
         registry   : ${{secrets.ACR_USERNAME}}.azurecr.io
         username   : ${{secrets.ACR_USERNAME}}
         password   : ${{secrets.ACR_PASSWORD}}
