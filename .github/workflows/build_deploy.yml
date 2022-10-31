@@ -9,32 +9,29 @@ env :
   GH_REPO    : Bineo2/data-functions
   BRANCH_ENV : ${{github.base_ref || github.ref_name}}
   DKR_IMAGE  : data-functions-wap
-  DKR_TAG    : '1.0.29'
+  DKR_TAG    : '1.0.30'
 
 
 jobs :
-  init :
-    runs-on : ubuntu-latest
-    steps : 
-      - name : Set Variables
-        id   : set-variables
-        run  : |
-          case "${{env.BRANCH_ENV}}" in
-            "dev") 
-              echo "WAP_NAME=wap-validation-services-dev"    >> $GITHUB_ENV;;
-            "qas")
-              echo "WAP_NAME=as-validationServices-data-qas" >> $GITHUB_ENV;;
-            "stg")
-              echo "WAP_NAME=as-validationServices-adm-stg"  >> $GITHUB_ENV;;
-            "prd")
-              echo "WAP_NAME=as-validationServices-adm-prd"  >> $GITHUB_ENV;;
-          esac 
-  
   build-and-deploy :
-    runs-on     : ubuntu-latest
-    environment : ${{github.base_ref || github.ref_name}} 
-    
-    steps :
+    runs-on : ubuntu-latest
+    environment : ${{github.base_ref || github.ref_name}}     
+    steps : 
+
+    - name : Set Variables
+      id   : set-variables
+      run  : |
+        case "${{env.BRANCH_ENV}}" in
+          "dev") 
+            echo "WAP_NAME=wap-validation-services-dev"    >> $GITHUB_ENV;;
+          "qas")
+            echo "WAP_NAME=as-validationServices-data-qas" >> $GITHUB_ENV;;
+          "stg")
+            echo "WAP_NAME=as-validationServices-adm-stg"  >> $GITHUB_ENV;;
+          "prd")
+            echo "WAP_NAME=as-validationServices-adm-prd"  >> $GITHUB_ENV;;
+        esac
+
     - name : Checkout GitHub Actions
       uses : actions/checkout@main
       with :
