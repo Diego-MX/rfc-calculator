@@ -1,49 +1,45 @@
 name : Build and Deploy 
 
 on : 
-  pull_request :
+  push :
     branches : ['dev', 'qas', 'stg', 'prd']
 
 
 env :
-  GH_REPO   : Bineo2/data-functions
-  DKR_IMAGE : data-functions-wap
-  DKR_TAG   : '1.0.27'
+  GH_REPO    : Bineo2/data-functions
+  BRANCH_ENV : ${{github.base_ref || github.ref_name}}
+  DKR_IMAGE  : data-functions-wap
+  DKR_TAG    : '1.0.29'
 
 
 jobs :
   init :
     runs-on : ubuntu-latest
-    outputs : 
-      app-name : ${{steps.set-variables.outputs.app-name}}
-
     steps : 
       - name : Set Variables
         id   : set-variables
         run  : |
-          case "${{github.base_ref}}" in
+          case "${{env.BRANCH_ENV}}" in
             "dev") 
-              echo "::set-output name=app-name::wap-validation-services-dev"
-              ;;
+              echo "WAP_NAME=wap-validation-services-dev"    >> $GITHUB_ENV;;
             "qas")
-              echo "::set-output name=app-name::as-validationServices-data-qas"
-              ;;
+              echo "WAP_NAME=as-validationServices-data-qas" >> $GITHUB_ENV;;
             "stg")
-              echo "::set-output name=app-name::as-validationServices-adm-stg"
-              ;;
+              echo "WAP_NAME=as-validationServices-adm-stg"  >> $GITHUB_ENV;;
+            "prd")
+              echo "WAP_NAME=as-validationServices-adm-prd"  >> $GITHUB_ENV;;
           esac 
   
   build-and-deploy :
-    needs       : init
     runs-on     : ubuntu-latest
-    environment : ${{github.base_ref}} 
+    environment : ${{github.base_ref || github.ref_name}} 
     
     steps :
     - name : Checkout GitHub Actions
       uses : actions/checkout@main
       with :
         repository : ${{env.GH_REPO}}
-        ref        : ${{github.base_ref}}
+        ref        : ${{env.BRANCH_ENV}}
      
     - name : Build and push to registry 
       id   : container-registry
@@ -54,13 +50,13 @@ jobs :
         password   : ${{secrets.ACR_PASSWORD}}
         dockerfile : dockerfile.ci
         image      : ${{env.DKR_IMAGE}}
-        tags       : ${{env.DKR_TAG}}
-        buildArgs  : ENV_TYPE=${{github.base_ref}},SERVER_TYPE=wap
+        tags       : ${{env.DKR_TAG}}-${{env.BRANCH_ENV}}
+        buildArgs  : ENV_TYPE=${{env.BRANCH_ENV}},SERVER_TYPE=wap
         
     - name : Deploy to App Service
       uses : azure/webapps-deploy@v2
       with :
-        images   : ${{secrets.ACR_USERNAME}}.azurecr.io/${{env.DKR_IMAGE}}:${{env.DKR_TAG}}
-        app-name : ${{needs.init.outputs.app-name}}
+        images   : ${{secrets.ACR_USERNAME}}.azurecr.io/${{env.DKR_IMAGE}}:${{env.DKR_TAG}}-${{env.BRANCH_ENV}}
+        app-name : ${{env.WAP_NAME}}
         publish-profile : ${{secrets.WAP_PUBLISH}}
        
