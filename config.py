@@ -5,7 +5,7 @@ SITE = Path(__file__).parent if '__file__' in globals() else Path(os.getcwd())
 
 ENV     = os.getenv('ENV_TYPE', 'local') 
 SERVER  = os.getenv('SERVER_TYPE')
-VERSION = '1.0.29'
+VERSION = '1.0.30'
 
 
 # Estos son los endpoints finales para hacer pruebas. 
