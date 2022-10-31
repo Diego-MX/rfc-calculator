@@ -1,74 +1,59 @@
-name: Build Dev
+name : Build and Deploy 
 
-on: 
-  push:
-    branches: 
-      - dev
-      - qas
+on : 
+  push :
+    branches : ['dev', 'qas', 'stg', 'prd']
 
-env:
-  ACR_USER : DatalakeEpicContainerRegistry
-  DKR_IMAGE: data-functions-wap-dev
-  DKR_TAG  : '1.0.23'
-   
-    
+
+env :
+  GH_REPO    : Bineo2/data-functions
+  BRANCH_ENV : ${{github.base_ref || github.ref_name}}
+  DKR_IMAGE  : data-functions-wap
+  DKR_TAG    : '1.0.30'
+
+
 jobs :
-  init :
+  build-and-deploy :
     runs-on : ubuntu-latest
-    outputs : 
-      env-branch : ${{steps.set-variables.outputs.env-branch}}
-      registry   : ${{steps.set-variables.outputs.registry}}
-      app-name   : ${{steps.set-variables.outputs.app-name}}
-
+    environment : ${{github.base_ref || github.ref_name}}     
     steps : 
-      - name : Set Variables
-        id   : set-variables
-        run  : |
-          case ${GITHUB_BASE_REF##*/} in
-            "dev") 
-              echo "::set-output name=env-branch::dev"
-              echo "::set-output name=registry::datalakeepiccontainerregistry.azurecr.io"
-              echo "::set-output name=app-name::wap-validation-services-dev"
-              ;;
-            "qas")
-              echo "::set-output name=env-branch::qas"
-              echo "::set-output name=registry::acrCrossChannelDataQas.azurecr.io"
-              echo "::set-output app-name::as-validationServices-data-qas"
-              ;;
-            "stg")
-              echo "::set-output name=env-branch::stg"
-              echo "::set-output name=registry::acrCrossChannelDataStg.azurecr.io"
-              echo "::set-output name=app-name::as-validationServices-data-stg"
-              ;;
-          esac 
-  
-  build-and-deploy-dev :
-    runs-on     : ubuntu-latest
-    needs       : init
-    environment : ${{needs.init.outputs.env-brach}} 
-    
-    steps :
+
+    - name : Set Variables
+      id   : set-variables
+      run  : |
+        case "${{env.BRANCH_ENV}}" in
+          "dev") 
+            echo "WAP_NAME=wap-validation-services-dev"    >> $GITHUB_ENV;;
+          "qas")
+            echo "WAP_NAME=as-validationServices-data-qas" >> $GITHUB_ENV;;
+          "stg")
+            echo "WAP_NAME=as-validationServices-adm-stg"  >> $GITHUB_ENV;;
+          "prd")
+            echo "WAP_NAME=as-validationServices-adm-prd"  >> $GITHUB_ENV;;
+        esac
+
     - name : Checkout GitHub Actions
       uses : actions/checkout@main
       with :
-        ref : ${{needs.init.outputs.env-branch}}
+        repository : ${{env.GH_REPO}}
+        ref        : ${{env.BRANCH_ENV}}
      
     - name : Build and push to registry 
       id   : container-registry
       uses : mr-smithers-excellent/docker-build-push@v5.5
       with : 
+        registry   : ${{secrets.ACR_USERNAME}}.azurecr.io
+        username   : ${{secrets.ACR_USERNAME}}
+        password   : ${{secrets.ACR_PASSWORD}}
         dockerfile : dockerfile.ci
         image      : ${{env.DKR_IMAGE}}
-        tags       : ${{env.DKR_TAG}}
-        registry   : ${{needs.init.outputs.registry}}
-        username   : ${{env.ACR_USER}}
-        password   : ${{secrets.ACR_PASS}}
-        
+        tags       : ${{env.DKR_TAG}}-${{env.BRANCH_ENV}}
+        buildArgs  : ENV_TYPE=${{env.BRANCH_ENV}},SERVER_TYPE=wap
         
     - name : Deploy to App Service
       uses : azure/webapps-deploy@v2
       with :
-        app-name       : ${{needs.init.outputs.app-name}}
-        images         : ${{needs.init.outputs.registry}}/${{env.DKR_IMAGE}}:${{env.DKR_TAG}}
-        publish-profile: ${{secrets.WAP_PUBLISH}}
+        images   : ${{secrets.ACR_USERNAME}}.azurecr.io/${{env.DKR_IMAGE}}:${{env.DKR_TAG}}-${{env.BRANCH_ENV}}
+        app-name : ${{env.WAP_NAME}}
+        publish-profile : ${{secrets.WAP_PUBLISH}}
        
