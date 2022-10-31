@@ -1,7 +1,8 @@
+
 deploy_tools
 .vscode
 fastapi-eg
-data-functions-FASTAPI.zip
+*.zip
 
 
 ####  Python

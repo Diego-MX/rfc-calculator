@@ -14,17 +14,16 @@ def move_args(func, k):
     return new_func
 
 
-def identity(x): return x
+def compose_0(x): return x
  
 def eval_func(func, *args, **kwargs): return func(*args, **kwargs)
 
 def compose_2(inner, outer): return lambda x: outer(inner(x))
 
 
-compose_ls = partial(move_args(reduce, 1), compose_2, identity)
+compose_ls = partial(move_args(reduce, 1), compose_2, compose_0)
 # compose_ls = lambda fn_ls: reduce(compose_2, fn_ls, identity)
 
-arg0_to_end = partial(move_args, k=0)
 arg0_to_end = partial(move_args, k=0)
 
 

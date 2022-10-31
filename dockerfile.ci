@@ -4,8 +4,14 @@ FROM python:3.8-slim
 WORKDIR /app
 COPY . .
 RUN pip install --trusted-host pypi.python.org -r /app/requirements.txt
+
+ARG ENV_TYPE
+ARG SERVER_TYPE
+ENV ENV_TYPE ${ENV_TYPE}
+ENV SERVER_TYPE ${SERVER_TYPE}
+
 EXPOSE 80
-CMD ["python", "-m", "src.app.start_fastapi"]
+CMD ["python", "-m", "src.app.start"]
 
 
 
