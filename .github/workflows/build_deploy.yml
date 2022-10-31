@@ -57,6 +57,6 @@ jobs :
       uses : azure/webapps-deploy@v2
       with :
         images   : ${{secrets.ACR_USERNAME}}.azurecr.io/${{env.DKR_IMAGE}}:${{env.DKR_TAG}}-${{github.ref_name}}
-        app-name : ${{github.ref_name}}
+        app-name : ${{env.WAP_NAME}}
         publish-profile : ${{secrets.WAP_PUBLISH}}
        
