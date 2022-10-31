@@ -32,7 +32,7 @@ jobs :
   
   build-and-deploy :
     runs-on     : ubuntu-latest
-    environment : ${{env.BRANCH_ENV}} 
+    environment : ${{github.base_ref || github.ref_name}} 
     
     steps :
     - name : Checkout GitHub Actions
