@@ -9,7 +9,7 @@ env :
   GH_REPO    : Bineo2/data-functions
   BRANCH_ENV : ${{github.base_ref || github.ref_name}}
   DKR_IMAGE  : data-functions-wap
-  DKR_TAG    : '1.0.30'
+  DKR_TAG    : '1.0.31'
 
 
 jobs :
@@ -29,7 +29,7 @@ jobs :
           "stg")
             echo "WAP_NAME=as-validationServices-adm-stg"  >> $GITHUB_ENV;;
           "prd")
-            echo "WAP_NAME=as-validationServices-adm-prd"  >> $GITHUB_ENV;;
+            echo "WAP_NAME=as-validationServices-data-prd" >> $GITHUB_ENV;;
         esac
 
     - name : Checkout GitHub Actions
