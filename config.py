@@ -5,7 +5,7 @@ SITE = Path(__file__).parent if '__file__' in globals() else Path(os.getcwd())
 
 ENV     = os.getenv('ENV_TYPE', 'local') 
 SERVER  = os.getenv('SERVER_TYPE')
-VERSION = '1.0.31'
+VERSION = '1.0.32'
 
 
 # Estos son los endpoints finales para hacer pruebas. 
@@ -48,7 +48,12 @@ ENV_KEYS = {
             'name'  : 'stlakehyliaprd', 
             'url'   : 'https://stlakehyliaprd.blob.core.windows.net/', 
             'root'  : 'product/epic-catalogs/app-services' } }, 
- } 
+    'drp'   : {
+        'storage'   : {
+            'name'  : 'stlakehyliaprd', 
+            'root'  : 'product/epic-catalogs/app-services' } }, 
+            'url'   : 'https://stlakehyliaprd.blob.core.windows.net/', 
+} 
 
 
 # Se utiliza para guardar archivos temporales, dependiendo del ambiente. 
@@ -57,7 +62,8 @@ PATH_DIRS = {
     'dev'   : Path('/tmp'), 
     'qas'   : Path('/tmp'), 
     'stg'   : Path('/tmp'), 
-    'prd'   : Path('/tmp'),     
+    'prd'   : Path('/tmp'),
+    'drp'   : Path('/tmp')     
 }
 
 # Este se usa para correr tests. 
