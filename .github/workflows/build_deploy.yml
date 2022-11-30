@@ -2,19 +2,19 @@ name : Build and Deploy
 
 on : 
   push :
-    branches : ['dev', 'qas', 'stg', 'prd']
+    branches : ['dev', 'qas', 'stg', 'prd', 'drp']
 
 
 env :
   GH_REPO    : Bineo2/data-functions
   BRANCH_ENV : ${{github.base_ref || github.ref_name}}
   DKR_IMAGE  : data-functions-wap
-  DKR_TAG    : '1.0.31'
+  DKR_TAG    : '1.0.32'
 
 
 jobs :
   build-and-deploy :
-    runs-on : ubuntu-latest
+    runs-on     : ubuntu-latest
     environment : ${{github.base_ref || github.ref_name}}     
     steps : 
 
@@ -30,6 +30,8 @@ jobs :
             echo "WAP_NAME=as-validationServices-adm-stg"  >> $GITHUB_ENV;;
           "prd")
             echo "WAP_NAME=as-validationServices-data-prd" >> $GITHUB_ENV;;
+          "drp")
+            echo "WAP_NAME=as-validationServices-data-drp" >> $GITHUB_ENV;;
         esac
 
     - name : Checkout GitHub Actions
@@ -53,7 +55,7 @@ jobs :
     - name : Deploy to App Service
       uses : azure/webapps-deploy@v2
       with :
-        images   : ${{secrets.ACR_USERNAME}}.azurecr.io/${{env.DKR_IMAGE}}:${{env.DKR_TAG}}-${{env.BRANCH_ENV}}
+        images  : '${{secrets.ACR_USERNAME}}.azurecr.io/${{env.DKR_IMAGE}}:${{env.DKR_TAG}}-${{env.BRANCH_ENV}}'
         app-name : ${{env.WAP_NAME}}
         publish-profile : ${{secrets.WAP_PUBLISH}}
        
