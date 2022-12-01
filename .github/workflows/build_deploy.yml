@@ -3,13 +3,14 @@ name : Build and Deploy
 on : 
   push :
     branches : ['dev', 'qas', 'stg', 'prd', 'drp']
-
+  pull_request : 
+    branches : ['dev', 'qas', 'stg', 'prd', 'drp']
 
 env :
   GH_REPO    : Bineo2/data-functions
   BRANCH_ENV : ${{github.base_ref || github.ref_name}}
   DKR_IMAGE  : data-functions-wap
-  DKR_TAG    : '1.0.32'
+  DKR_TAG    : '1.0.33'
 
 
 jobs :
