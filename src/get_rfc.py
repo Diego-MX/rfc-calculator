@@ -177,10 +177,10 @@ class PersonPhysical(BaseModel):
 
     
     def get_initials(cls, helpers, mode): 
-        p_lastname = helpers['names'][0]
-        m_lastname = helpers['names'][1]
-        lastname_0 = helpers['one_lastname'][0]
-        lastname_1 = helpers['one_lastname'][1]
+        p_lastname  = helpers['names'][0]
+        m_lastname  = helpers['names'][1]
+        lastname_0  = helpers['one_lastname'][0]
+        lastname_1  = helpers['one_lastname'][1]
         firstname_0 = helpers['one_firstname']
         
         params = { 'RFC' : ('AEIOU' , 3), 
@@ -238,9 +238,9 @@ class PersonPhysical(BaseModel):
     def get_homoclave(cls, helpers, mode): 
         if mode == 'RFC': 
             names_str = helpers['names_str']
-            idx_list = [CHARS_1.index(c_char) for c_char in list(names_str)] 
-            idx_seq = ['0'] + [f'{c_pos:02}'  for c_pos  in idx_list]
-            int_list = [int(c_char) for c_char in ''.join(idx_seq)]
+            idx_list  = [CHARS_1.index(c_char) for c_char in list(names_str)] 
+            idx_seq   = ['0'] + [f'{c_pos:02}'  for c_pos  in idx_list]
+            int_list  = [int(c_char) for c_char in ''.join(idx_seq)]
             sum_terms = [10*int_list[i]*c_i + c_i**2 
                     for i, c_i in enumerate(int_list[1:])]
             # The actual definition is the sum of all two digit numbers times 
@@ -249,7 +249,6 @@ class PersonPhysical(BaseModel):
             #   where i1 = (i+1) for i = 0,...,len(C). 
             # Alongside notice that we have shifted indices in SUM_TERMS,
             #   so that C_i = INT_LIST[i+1] in the expression above. 
-
             sum_1000 = sum(sum_terms) % 1000
             (quotient, residue) = (sum_1000 // 34, sum_1000 % 34)
             homoclave = (CHARS_2[quotient] + CHARS_2[residue])
@@ -286,7 +285,7 @@ class PersonPhysical(BaseModel):
 
         # For OKAY_02, an infrequent case when second initial is not vowel,
         # it must be that there are only 3 initials, hence the fourth character is a 0-9 digit. 
-        okay_01 = has_match(rfc_1, r"[A-Z]{3,4}\d{6}[A-Z\d]{2}\d")
+        okay_01 = has_match(rfc_1, r"[A-Z]{3,4}[0-9]{6}[A-Z0-9]{2}[A0-9]")
         okay_02 = has_match(rfc_1[1], r"[AEIOU]") or has_match(rfc_1[3], r"[0-9]")
         okay_03 = valid_datestring(rfc_1[-9:-3]) 
         
