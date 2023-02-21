@@ -10,7 +10,7 @@ env :
   GH_REPO    : Bineo2/data-functions
   BRANCH_ENV : ${{github.base_ref || github.ref_name}}
   DKR_IMAGE  : data-functions-wap
-  DKR_TAG    : '1.0.34'
+  DKR_TAG    : '1.0.35'
 
 
 jobs :
@@ -45,7 +45,7 @@ jobs :
       id   : container-registry
       uses : mr-smithers-excellent/docker-build-push@v5.5
       with : 
-        registry   : ${{secrets.ACR_USERNAME}}.azurecr.io
+        registry   : ${{secrets.ACR_HOST}}
         username   : ${{secrets.ACR_USERNAME}}
         password   : ${{secrets.ACR_PASSWORD}}
         dockerfile : dockerfile.ci
@@ -56,7 +56,7 @@ jobs :
     - name : Deploy to App Service
       uses : azure/webapps-deploy@v2
       with :
-        images  : '${{secrets.ACR_USERNAME}}.azurecr.io/${{env.DKR_IMAGE}}:${{env.DKR_TAG}}-${{env.BRANCH_ENV}}'
+        images  : '${{secrets.ACR_HOST}}/${{env.DKR_IMAGE}}:${{env.DKR_TAG}}-${{env.BRANCH_ENV}}'
         app-name : ${{env.WAP_NAME}}
         publish-profile : ${{secrets.WAP_PUBLISH}}
        
