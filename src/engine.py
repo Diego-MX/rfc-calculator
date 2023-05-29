@@ -13,11 +13,11 @@ from src.app.models import RFCValidationResponse
 
 def process_rfc_physical(an_input): 
     try: 
-        a_person     = an_input.get('personPhysical')
-        campos_ls    = ['last_name', 'maternal_last_name', 'first_name']
-        nombres_ls   = itemgetter(*campos_ls)(a_person)
-        f_inicio     = dt.strptime(a_person.get('date_of_birth'), '%Y-%m-%d')
-        el_rfc       = rfc_completo('fisica', nombres_ls, f_inicio)
+        a_person   = an_input.get('personPhysical')
+        campos_ls  = ['last_name', 'maternal_last_name', 'first_name']
+        nombres_ls = itemgetter(*campos_ls)(a_person)
+        f_inicio   = dt.strptime(a_person.get('date_of_birth'), '%Y-%m-%d')
+        el_rfc     = rfc_completo('fisica', nombres_ls, f_inicio)
         return {'rfc' : el_rfc}
 
     except ValueError: 
@@ -44,16 +44,26 @@ def validate_rfc_physical(req_validation, response:Response):
     try:
         rfc_user = req_validation.userRFC
         rfc_engine = req_validation.calculatedRFC
-        fail_keys = [not ok for ok in PersonPhysical.validate_rfc(rfc_user, rfc_engine)]
+
+        okay_keys = PersonPhysical.validate_rfc(rfc_user, rfc_engine)
         
-        index = -1 if sum(fail_keys) == 0 else -2
-        an_obj = RFCValidationResponse.from_key(index)
-        if sum(fail_keys) > 0: 
+        if all(okay_keys[:-1]):  # except last one. 
+            index = -1
+        elif okay_keys[-1]: 
+            index = -4
+        else:
+            index = -2
+
+
+        if index != -2: 
+            return RFCValidationResponse.from_key(index)
+        else: 
             response.status_code = status.HTTP_409_CONFLICT
-        return an_obj
+            return response
 
     except Exception as expt: 
         raise HTTPException(status_code=500, detail=str(expt))
+
 
 def process_curp(person_obj: PersonPhysical):
     try:

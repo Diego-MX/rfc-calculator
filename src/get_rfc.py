@@ -281,28 +281,31 @@ class PersonPhysical(BaseModel):
         rfc_1 = rfc_1.upper()  # USER
         rfc_0 = rfc_0.upper()  # CALCULATED
 
+        k_init = 4 if has_match(rfc_1[1], r"[AEIOU]") else 3
+        
         okays = [False]*5
 
-        # For OKAY_02, an infrequent case when second initial is not vowel,
-        # it must be that there are only 3 initials, hence the fourth character is a 0-9 digit. 
-        okay_01 = has_match(rfc_1, r"[A-Z]{3,4}[0-9]{6}[A-Z0-9]{2}[A0-9]")
+        # Structure format.
+        okay_01 = has_match(rfc_1, r"[A-Z]{3,4}[0-9]{6}[A-Z0-9]{3}")
+        # Initals are okay. 
         okay_02 = has_match(rfc_1[1], r"[AEIOU]") or has_match(rfc_1[3], r"[0-9]")
+        # Date-of-birth is a date.   
         okay_03 = valid_datestring(rfc_1[-9:-3]) 
         
-        # Format
+
+        # Initial validator.   
         okays[0] = (okay_01 and okay_02 and okay_03)
-        # Verification Digit
+        # Verificator digit validator.  
         okays[1] = (len(rfc_1) == len(rfc_0) 
                 and cls.get_verificator(rfc_1[:-1], 'RFC') == rfc_1[-1])
         # Homonymial Keys
-        okays[2] = (rfc_1[-3:-1] == rfc_0[-3:-1])
-        # Date of Birdth
-        okays[3] = (rfc_1[-9:-3] == rfc_0[-9:-3] and okay_03)
+        okays[2] = (len(rfc_1) == len(rfc_0)
+                and rfc_1[-3:-1] == rfc_0[-3:-1])
+        # Date of Birth
+        okays[3] = okay_03 and (rfc_1[k_init:k_init+6] == rfc_0[k_init:k_init+6])
         # Initials
-        okays[4] = (rfc_1[  :-9] == rfc_0[  :-9])
+        okays[4] = okay_02 and (rfc_1[:k_init] == rfc_0[:k_init])
         return okays
-
-
 
 
             

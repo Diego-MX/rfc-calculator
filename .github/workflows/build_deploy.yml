@@ -10,7 +10,7 @@ env :
   GH_REPO    : Bineo2/data-functions
   BRANCH_ENV : ${{github.base_ref || github.ref_name}}
   DKR_IMAGE  : data-functions-wap
-  DKR_TAG    : '1.0.35'
+  DKR_TAG    : '1.0.36'
 
 
 jobs :
