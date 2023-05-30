@@ -18,11 +18,11 @@ class RFCValidationResponse(BaseModel):
     key: int
     name: str
     message: str
-
     messages: ClassVar[Dict] = {
-        '-3': ('Error no reconocido', "Tu RFC no se puede determinar"),
-        '-2': ('RFC Inválido', "Tu RFC tiene errores, ingrésalo nuevamente"),
         '-1': ('RFC Válido', "Tu RFC es válido"), 
+        '-2': ('RFC Inválido', "Tu RFC tiene errores, ingrésalo nuevamente"),
+        '-3': ('Error no reconocido', "Tu RFC no se puede determinar"),
+        '-4': ('RFC Incompleto', "Tu RFC no contiene homoclave, pero la base es correcta"), 
         '0' : ('Formato', "El formato de tu RFC es incorrecto, ingrésalo nuevamente"), 
         '1' : ('Dígito verificador', "El último dígito de tu RFC no corresponde, ingrésalo correctamente"), 
         '2' : ('Homoclave', "La homoclave de tu RFC no coincide, ingrésala nuevamente"), 
