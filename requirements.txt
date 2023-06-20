@@ -6,7 +6,7 @@ pandas
 pyarrow
 
 orjson
-Unidecode
+unidecode
 
 python-dotenv
 azure-identity
