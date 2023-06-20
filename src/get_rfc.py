@@ -281,16 +281,18 @@ class PersonPhysical(BaseModel):
         rfc_1 = rfc_1.upper()  # USER
         rfc_0 = rfc_0.upper()  # CALCULATED
 
-        k_init = 4 if has_match(rfc_1[1], r"[AEIOU]") else 3
+        k_inits = 4 if has_match(rfc_1[1], r"[AEIOU]") else 3
         
-        okays = [False]*5
+        okays = [False]*6
 
         # Structure format.
-        okay_01 = has_match(rfc_1, r"[A-Z]{3,4}[0-9]{6}[A-Z0-9]{3}")
+        okay_01 = has_match(rfc_1, r"^[A-Z]{3,4}[0-9]{6}[A-Z0-9]{3}$")
         # Initals are okay. 
         okay_02 = has_match(rfc_1[1], r"[AEIOU]") or has_match(rfc_1[3], r"[0-9]")
         # Date-of-birth is a date.   
-        okay_03 = valid_datestring(rfc_1[-9:-3]) 
+        okay_03 = valid_datestring(rfc_1[-9:-3])
+        
+        okay_05 = has_match(rfc_1, r"^[A-Z]{3,4}[0-9]{6}$")
         
 
         # Initial validator.   
@@ -302,22 +304,14 @@ class PersonPhysical(BaseModel):
         okays[2] = (len(rfc_1) == len(rfc_0)
                 and rfc_1[-3:-1] == rfc_0[-3:-1])
         # Date of Birth
-        okays[3] = okay_03 and (rfc_1[k_init:k_init+6] == rfc_0[k_init:k_init+6])
+        okays[3] = okay_03 and (rfc_1[k_inits:k_inits+6] == rfc_0[k_inits:k_inits+6])
         # Initials
-        okays[4] = okay_02 and (rfc_1[:k_init] == rfc_0[:k_init])
+        okays[4] = okay_02 and (rfc_1[:k_inits] == rfc_0[:k_inits])
+        okays[5] = okay_05 and okays[4] and okays[3]
         return okays
 
 
-            
-# class MoralPerson(BaseModel): 
-#     person_type:    Literal['moral']
-#     names_list:     str
-#     date_of_issue:  date
-
-
-# Person = Annotated[ Union[Person, MoralPerson], 
-#         Field(discriminator='person_type') ]
-
+           
 
 
 class PersonaFisica:
