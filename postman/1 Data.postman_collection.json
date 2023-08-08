@@ -1,0 +1,486 @@
+{
+	"info": {
+		"_postman_id": "35739c7d-ff51-4e99-bcdd-7afcaf680bc3",
+		"name": "1 Data",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "14806323",
+		"_collection_link": "https://epic-sap-startup.postman.co/workspace/Data-Tech~5217b677-710c-4b0e-8170-429266dd9865/collection/14806323-35739c7d-ff51-4e99-bcdd-7afcaf680bc3?action=share&creator=14806323&source=collection_link"
+	},
+	"item": [
+		{
+			"name": "validation base",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// {{API_URL}}/data/validation-services/v1/base-url",
+							"// {{API_URL}}/validation-services/v1/",
+							"// {{API_URL}}/",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "subscription-key",
+						"value": "{{AZ_SUBSTN}}",
+						"description": "Es la subscripción del producto en Azure (APIM)",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{API_URL}}/data/validation-services/v1",
+					"host": [
+						"{{API_URL}}"
+					],
+					"path": [
+						"data",
+						"validation-services",
+						"v1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "validation rfc",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// {{API_URL}}/data/validation-services/v1/",
+							"// {{API_URL}}/data/validation-services/v1/get-rfc",
+							"// {{API_URL}}/get-rfc",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "subscription-key",
+						"value": "{{AZ_SUBSTN}}",
+						"description": "Es la subscripción del producto en Azure (APIM)",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"firstName\": \"Diego\",\r\n    \"lastName\": \"Villamil\",\r\n    \"maternalLastName\": \"Pesqueira\",\r\n    \"dateOfBirth\": \"1983-12-27\",\r\n    \"stateOfBirth\": \"Ciudad de México\",\r\n    \"gender\": \"H\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{API_URL}}/data/validation-services/v1/rfc-ph",
+					"host": [
+						"{{API_URL}}"
+					],
+					"path": [
+						"data",
+						"validation-services",
+						"v1",
+						"rfc-ph"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "validation rfc compare",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// {{API_URL}}/data/validation-services/v1/",
+							"// {{API_URL}}/data/validation-services/v1/get-rfc",
+							"",
+							"// La sintaxis cambia de Pre-staging a Staging",
+							"// {{API_URL}}/rfc-validate",
+							"// {{API_URL}}/data/validation-services/v1/validate-rfc",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "subscription-key",
+						"value": "{{AZ_SUBSTN}}",
+						"description": "Es la subscripción del producto en Azure (APIM)",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"userRFC\": \"VIPD833227DH2\",\r\n    \"calculatedRFC\": \"VIPD833227DH2\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{API_URL}}/data/validation-services/v1/rfc-validate",
+					"host": [
+						"{{API_URL}}"
+					],
+					"path": [
+						"data",
+						"validation-services",
+						"v1",
+						"rfc-validate"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "validation curp",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// {{API_URL}}/data/validation-services/v1/",
+							"// {{API_URL}}/data/validation-services/v1/get-rfc",
+							"// {{API_URL}}/get-rfc",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "subscription-key",
+						"value": "{{AZ_SUBSTN}}",
+						"description": "Es la subscripción del producto en Azure (APIM)",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"firstName\": \"Diego\",\r\n    \"lastName\": \"Villamil\",\r\n    \"maternalLastName\": \"Pesqueira\",\r\n    \"dateOfBirth\": \"1983-12-27\", \r\n    \"stateOfBirth\": \"Ciudad de México\",\r\n    \"gender\": \"H\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{API_URL}}/data/validation-services/v1/curp",
+					"host": [
+						"{{API_URL}}"
+					],
+					"path": [
+						"data",
+						"validation-services",
+						"v1",
+						"curp"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "validation rfc old",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// {{API_URL}}/data/validation-services/v1/",
+							"// {{API_URL}}/data/validation-services/v1/get-rfc",
+							"// {{API_URL}}/get-rfc",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "subscription-key",
+						"value": "{{AZ_SUBSTN}}",
+						"description": "Es la subscripción del producto en Azure (APIM)",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"personPhysical\": {\r\n        \"firstName\": \"Diego\",\r\n        \"lastName\": \"Villamil\",\r\n        \"maternalLastName\": \"Pesqueira\",\r\n        \"dateOfBirth\": \"1983-12-27\"\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{API_URL}}/data/validation-services/v1/get-rfc",
+					"host": [
+						"{{API_URL}}"
+					],
+					"path": [
+						"data",
+						"validation-services",
+						"v1",
+						"get-rfc"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "validation alias",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// {{API_URL}}/data/validation-services/v1/approve-alias",
+							"// {{API_URL}}/approve-alias/Don Boludo",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "subscription-key",
+						"value": "{{AZ_SUBSTN}}",
+						"description": "Es la subscripción del producto en Azure (APIM)",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{API_URL}}/data/validation-services/v1/approve-alias/Don Boludo",
+					"host": [
+						"{{API_URL}}"
+					],
+					"path": [
+						"data",
+						"validation-services",
+						"v1",
+						"approve-alias",
+						"Don Boludo"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "catalogs zipcodes",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Cambiar URLs en QA y Staging.",
+							"// {{API_URL}}/data/catalogs/v1/zipcode-neighborhoods  Funciona",
+							"// {{API_URL}}/zipcode-neighborhoods",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "subscription-key",
+						"value": "{{AZ_SUBSTN}}",
+						"description": "Es la subscripción del producto en Azure (APIM)",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{API_URL}}/data/catalogs/v1/zipcode-neighborhoods/55117",
+					"host": [
+						"{{API_URL}}"
+					],
+					"path": [
+						"data",
+						"catalogs",
+						"v1",
+						"zipcode-neighborhoods",
+						"55117"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "catalogs bancos",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// GET {{API_URL}}/data/catalogs/v1/national-banks/...",
+							"",
+							"// GET {{API_URL}}/national-banks/card-number/5499490544796915",
+							"// GET {{API_URL}}/national-banks/parse-clabe/002180700845152894",
+							"// GET {{API_URL}}/national-banks/ ",
+							"",
+							"// GET {{API_URL}}}",
+							"// Modify Headers:Accept (*/*) | (application/bankobject+json)",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true,
+				"disabledSystemHeaders": {
+					"accept": true
+				}
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "subscription-key",
+						"value": "{{AZ_SUBSTN}}",
+						"description": "Es la subscripción del producto en Azure (APIM)",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/bankobject+json",
+						"description": "Regresar un objeto de banco",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{API_URL}}/data/catalogs/v1/national-banks/card-number/5402080000664781",
+					"host": [
+						"{{API_URL}}"
+					],
+					"path": [
+						"data",
+						"catalogs",
+						"v1",
+						"national-banks",
+						"card-number",
+						"5402080000664781"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{OAUTH_TKN}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"",
+					"const url_login     = pm.environment.get(\"OAUTH_URL\");",
+					"const run_oauth     = pm.environment.get(\"OAUTH_RUN\");",
+					"const client_id     = pm.environment.get(\"SP_CLIENT\");",
+					"const client_secret = pm.environment.get(\"SP_SECRET\");",
+					"const scope         = pm.environment.get(\"SP_SCOPE\");",
+					"",
+					"if (run_oauth == 'true') {",
+					"    var a_request = {",
+					"            url: url_login,",
+					"            method: 'POST',",
+					"            header: { 'Content-Type': 'application/x-www-form-urlencoded'},",
+					"            body  : {",
+					"                mode: 'urlencoded',",
+					"                urlencoded : [",
+					"                    { key: 'client_id', value: client_id},",
+					"                    { key: 'client_secret', value: client_secret},",
+					"                    { key: 'scope', value: scope},",
+					"                    { key: 'grant_type', value: 'client_credentials'},",
+					"                    ]}",
+					"        };",
+					"    pm.sendRequest(a_request, ",
+					"        function (err, response) {",
+					"            pm.environment.set(\"OAUTH_TKN\", response.json()[\"access_token\"]);",
+					"        });",
+					"};"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}

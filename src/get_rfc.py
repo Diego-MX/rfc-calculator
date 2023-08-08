@@ -45,13 +45,13 @@ INCONVENIENTS = {
         ).split(', ') }  # 81 words
 
 IGNORE_WORDS = {
-    'RFC': ("EL, LA, DE, S DE RL, SA DE CV, DE, LOS, LAS, Y, MC, DEL, SA, " + 
-        "COMPAÑIA, CIA, SOCIEDAD, SOC, COOPERATIVA, COOP, S EN C POR A, " + 
-        "A EN P, MAC, S EN NC, S EN C, VAN, PARA, EN, MI, POR, CON, AL, SUS, " +
-        "E, SC, SCL, SCS, SNC, THE, OF, AND, COMPANY, CO, MC, MI, A, SRL CV, " + 
+    'RFC': ("EL, LA, DE, S DE RL, SA DE CV, DE, LOS, LAS, Y, MC, DEL, SA, "
+        "COMPAÑIA, CIA, SOCIEDAD, SOC, COOPERATIVA, COOP, S EN C POR A, "
+        "A EN P, MAC, S EN NC, S EN C, VAN, PARA, EN, MI, POR, CON, AL, SUS, "
+        "E, SC, SCL, SCS, SNC, THE, OF, AND, COMPANY, CO, MC, MI, A, SRL CV, "
         "SA DE CV MI, SA MI, COMPA.IA, SRL CV MI, SRL MI"
         ).split(', '), 
-    'CURP' : ("DA, DAS, DE, DEL, DER, DI, DIE, DD, EL, LA, LOS, LAS, LE, " + 
+    'CURP' : ("DA, DAS, DE, DEL, DER, DI, DIE, DD, EL, LA, LOS, LAS, LE, "
         "LES, MAC, MC, VAN, VON, Y"
         ).split(', ') }
 
@@ -64,11 +64,11 @@ NAZARENES = ['MARIA', 'JOSE', 'MA', 'MAXX']  # Last entry MAXX is used for MA,
     # when modified with some rules. 
 
 # These codes assume the Mexican State name. 
-states_str = ("Aguascalientes:AS, Baja California:BC, Baja California Sur:BS, " + 
-    "Campeche:CC, Chiapas:CS, Chihuahua:CH, Ciudad de México:DF, Coahuila:CL, " + 
-    "Colima:CM, Durango:DG, Guanajuato:GT, Guerrero:GR, Hidalgo:HG, Jalisco:JC, " + 
-    "Edo. México:MC, Morelos:MS, Nayarit:NT, Nuevo León:NL, Oaxaca:OC, Puebla:PL, " + 
-    "Querétaro:QO, Quintana Roo:QR, San Luis Potosí:SP, Sinaloa:SL, Sonora:SR, " + 
+states_str = ("Aguascalientes:AS, Baja California:BC, Baja California Sur:BS, " 
+    "Campeche:CC, Chiapas:CS, Chihuahua:CH, Ciudad de México:DF, Coahuila:CL, "
+    "Colima:CM, Durango:DG, Guanajuato:GT, Guerrero:GR, Hidalgo:HG, Jalisco:JC, "
+    "Edo. México:MC, Morelos:MS, Nayarit:NT, Nuevo León:NL, Oaxaca:OC, Puebla:PL, " 
+    "Querétaro:QO, Quintana Roo:QR, San Luis Potosí:SP, Sinaloa:SL, Sonora:SR, " 
     "Tabasco:TC, Tamaulipas:TS, Tlaxcala:TL, Veracruz:VZ, Yucatán:YN, Zacatecas:ZS")
 
 states_dict = dict(state.split(':') for state in states_str.split(', '))
@@ -176,6 +176,7 @@ class PersonPhysical(BaseModel):
         return helpers
 
     
+    @classmethod
     def get_initials(cls, helpers, mode): 
         p_lastname  = helpers['names'][0]
         m_lastname  = helpers['names'][1]
@@ -290,7 +291,7 @@ class PersonPhysical(BaseModel):
         # Initals are okay. 
         okay_02 = has_match(rfc_1[1], r"[AEIOU]") or has_match(rfc_1[3], r"[0-9]")
         # Date-of-birth is a date.   
-        okay_03 = valid_datestring(rfc_1[-9:-3])
+        okay_03 = valid_datestring(rfc_1[k_inits:(k_inits+6)])
         
         okay_05 = has_match(rfc_1, r"^[A-Z]{3,4}[0-9]{6}$")
         
@@ -304,9 +305,10 @@ class PersonPhysical(BaseModel):
         okays[2] = (len(rfc_1) == len(rfc_0)
                 and rfc_1[-3:-1] == rfc_0[-3:-1])
         # Date of Birth
-        okays[3] = okay_03 and (rfc_1[k_inits:k_inits+6] == rfc_0[k_inits:k_inits+6])
+        okays[3] = okay_03 and (rfc_1[k_inits:(k_inits+6)] == rfc_0[k_inits:(k_inits+6)])
         # Initials
         okays[4] = okay_02 and (rfc_1[:k_inits] == rfc_0[:k_inits])
+        # Pseudo-RFC. 
         okays[5] = okay_05 and okays[4] and okays[3]
         return okays
 
@@ -475,10 +477,10 @@ if __name__ == '__main__':
     
     person_dict = {
         'firstName' : "Alejandra Jimena",
-        'lastName' : "Rodriguez", 
         'maternalLastName': "Ruiz", 
         'dateOfBirth' : date(1985, 6, 14), 
         'stateOfBirth': 'Nuevo León', 
+        'lastName' : "Rodriguez", 
         'gender' : 'H'
     }
     
