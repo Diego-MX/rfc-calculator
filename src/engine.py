@@ -54,7 +54,6 @@ def validate_rfc_physical(req_validation, response:Response):
         else:
             index = -2
 
-
         if index != -2: 
             return RFCValidationResponse.from_key(index)
         else: 
