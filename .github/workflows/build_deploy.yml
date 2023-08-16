@@ -10,7 +10,7 @@ env :
   GH_REPO    : Bineo2/data-functions
   BRANCH_ENV : ${{github.base_ref || github.ref_name}}
   DKR_IMAGE  : data-functions-wap
-  #DKR_TAG    : '1.0.39'
+  DKR_TAG    : '1.0.39'
 
 
 jobs :
@@ -41,8 +41,8 @@ jobs :
         repository : ${{env.GH_REPO}}
         ref        : ${{env.BRANCH_ENV}}
      
-    - name: Generate DOCKER_TAG
-      run: echo DKR_TAG='${{github.ref_name}}-${{github.sha}}' >> $GITHUB_ENV
+    #- name: Generate DOCKER_TAG
+    #  run: echo DKR_TAG='${{github.ref_name}}-${{github.sha}}' >> $GITHUB_ENV
       
     - name : Build and push to registry 
       id   : container-registry
