@@ -109,10 +109,10 @@ class PersonPhysical(BaseModel):
     # person_type      : Literal['Physical']
     first_name         : str = Field(alias='firstName')
     last_name          : Optional[str] = Field(alias='lastName')
-    maternal_last_name : Optional[str] = Field(alias='maternalLastName')
+    maternal_last_name : Optional[str] = Field(default = '', alias='maternalLastName')
     date_of_birth      : Optional[date] = Field(alias='dateOfBirth') 
-    state_of_birth     : Optional[State] = Field(alias='stateOfBirth')
-    gender             : Optional[Gender]
+    state_of_birth     : Optional[State] = Field(default = None, alias='stateOfBirth')
+    gender             : Optional[Gender] = Field(default = None)
     # Construct with ALIAS, returns standard attribute. 
     # To return alias:  person_obj.dict(by_alias=True)
 
