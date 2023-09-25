@@ -1,12 +1,10 @@
 #!/usr/bin/env python3
-from enum import Enum
-
 from datetime import datetime as dt, date
+from enum import Enum
 from functools import partial
-import re 
-
-from typing import Optional
 from pydantic import BaseModel, Field
+import re 
+from typing import Optional
 
 from src.utilities.basic import (compose_ls, arg0_to_end, 
     str_iconv, str_multisub)
@@ -314,7 +312,6 @@ class PersonPhysical(BaseModel):
 
 
            
-
 
 class PersonaFisica:
     def __init__(self, nombres_ls):
