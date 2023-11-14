@@ -2,10 +2,10 @@
 from datetime import datetime as dt, date
 from enum import Enum
 from functools import partial
-from pydantic import BaseModel, Field
 import re 
 from typing import Optional
 
+from pydantic import BaseModel, Field
 from src.utilities.basic import (compose_ls, arg0_to_end, 
     str_iconv, str_multisub)
 

@@ -1,11 +1,11 @@
-import os
+import os   # pylint: disable=missing-module-docstring
 from pathlib import Path
 
 SITE = Path(__file__).parent if '__file__' in globals() else Path(os.getcwd())
 
 ENV     = os.getenv('ENV_TYPE', 'local') 
 SERVER  = os.getenv('SERVER_TYPE')
-VERSION = '1.0.39'   # BUILD_DEPLOY, line 13.  
+VERSION = '1.0.40'   # BUILD_DEPLOY, line 13.  
 
 
 # Estos son los endpoints finales para hacer pruebas. 
