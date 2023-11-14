@@ -1,28 +1,28 @@
 name : Build and Deploy 
 
-on : 
-  push :
-    branches : ['dev', 'qas', 'stg', 'prd', 'drp']
-  pull_request : 
-    branches : ['dev', 'qas', 'stg', 'prd', 'drp']
+on: 
+  workflow_dispatch:
+    inputs:
+      deploy_env:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'dev'
 
 env :
-  GH_REPO    : Bineo2/data-functions
-  BRANCH_ENV : ${{github.base_ref || github.ref_name}}
-  DKR_IMAGE  : data-functions-wap
-  DKR_TAG    : '1.0.39'
-
+  GH_REPO   : Bineo2/data-functions
+  DEPLOY_ENV: ${{github.event.inputs.deploy_env}}
+  DKR_IMAGE : data-functions-wap
+  DKR_TAG   : '1.0.40'
 
 jobs :
   build-and-deploy :
     runs-on     : ubuntu-latest
-    environment : ${{github.base_ref || github.ref_name}}     
+    environment : ${{env.DEPLOY_ENV}}
     steps : 
-
     - name : Set Variables
       id   : set-variables
       run  : |
-        case "${{env.BRANCH_ENV}}" in
+        case "${{env.DEPLOY_ENV}}" in
           "dev") 
             echo "WAP_NAME=wap-validation-services-dev"    >> $GITHUB_ENV;;
           "qas")
@@ -39,7 +39,7 @@ jobs :
       uses : actions/checkout@main
       with :
         repository : ${{env.GH_REPO}}
-        ref        : ${{env.BRANCH_ENV}}
+        ref        : ${{env.DEPLOY_ENV}}
      
     - name : Build and push to registry 
       id   : container-registry
@@ -50,13 +50,13 @@ jobs :
         password   : ${{secrets.ACR_PASSWORD}}
         dockerfile : dockerfile.ci
         image      : ${{env.DKR_IMAGE}}
-        tags       : ${{env.DKR_TAG}}-${{env.BRANCH_ENV}}
-        buildArgs  : ENV_TYPE=${{env.BRANCH_ENV}},SERVER_TYPE=wap
+        tags       : ${{env.DKR_TAG}}-${{env.DEPLOY_ENV}}
+        buildArgs  : ENV_TYPE=${{env.DEPLOY_ENV}},SERVER_TYPE=wap
         
     - name : Deploy to App Service
       uses : azure/webapps-deploy@v2
       with :
-        images  : '${{secrets.ACR_HOST}}/${{env.DKR_IMAGE}}:${{env.DKR_TAG}}-${{env.BRANCH_ENV}}'
+        images  : '${{secrets.ACR_HOST}}/${{env.DKR_IMAGE}}:${{env.DKR_TAG}}-${{env.DEPLOY_ENV}}'
         app-name : ${{env.WAP_NAME}}
         publish-profile : ${{secrets.WAP_PUBLISH}}
        
