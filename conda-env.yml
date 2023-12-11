@@ -1,0 +1,21 @@
+name: webapp
+
+channels: 
+  - conda-forge
+
+dependencies: 
+  - azure-identity
+  - azure-keyvault-secrets
+  - azure-storage-blob
+  - fastapi
+  - orjson=3.8.8
+  - pandas=1.5.3
+  - pyarrow=6.0.0
+  - python=3.8
+  - python-dotenv
+  - unidecode=1.2.0
+  - uvicorn
+  - pip
+  - pip: 
+    - clabe==1.2.8 
+    - databricks-sql-connector==2.5.1
