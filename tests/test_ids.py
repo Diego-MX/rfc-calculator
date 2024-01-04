@@ -1,5 +1,6 @@
-from requests import get as rq_get, post
 from unittest import TestCase, main as unit_main
+
+from requests import get as rq_get, post
 
 
 def set_example(type=None): 

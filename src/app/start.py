@@ -1,26 +1,34 @@
-import sys
-from fastapi import FastAPI, Response
 from json import loads
+import sys
+
+from fastapi import FastAPI, Response
 import uvicorn
 
-
-from .models import (RequestValidation, RequestRFC, 
-        OffensiveResponse, RFCValidationResponse, ORJSONResponse)
 from src.get_rfc import PersonPhysical
 from src import engine
 from config import VERSION
 
+from .models import (RequestValidation, RequestRFC, 
+    OffensiveResponse, RFCValidationResponse, ORJSONResponse)
+
+
+debug = 'debug' in sys.argv
+root_path = "data/docs/v1/validation-services" if not debug else None
+# Se cambió el ROOT_PATH para la documentación en Azure App Management.  
 
 app = FastAPI(
     title="Service Validation", 
     version=VERSION,
     openapi_tags=[
         {'name': 'ID keys', 
-            'description': "Obtain RFC and CURP for Persons (Physical); use date format YYYY-MM-DD."}, 
-        {'name': 'Alias', 'description': "Verify an alias doesn't contain offensive or curse words."}, 
-        {'name': 'Base', 'description': "Check base endpoint and version."}, 
+         'description':("Obtain RFC and CURP for Persons (Physical);" 
+                        "use date format YYYY-MM-DD.")}, 
+        {'name': 'Alias', 
+         'description': "Verify an alias doesn't contain offensive or curse words."}, 
+        {'name': 'Base', 
+         'description': "Check base endpoint and version."}, 
         {'name': 'Legacy'}], 
-    root_path="data/docs/v1/validation-services",
+    root_path=root_path,
     default_response_class=ORJSONResponse)
 
 
@@ -33,7 +41,6 @@ async def root():
 @app.post("/curp", tags=['ID keys'])
 async def person_curp(req_person: PersonPhysical):    
     return engine.process_curp(req_person)
-
 
 
 @app.post("/rfc-ph", tags=['ID keys'])
@@ -53,6 +60,8 @@ async def alias_approval(alias: str):
     a_response = engine.approve_alias(alias)
     return a_response
 
+
+#%% A partir de aquí son Legacy. 
 
 @app.get("/get-rfc", tags=['Legacy'])
 async def rfc_get(a_request: RequestRFC):    
@@ -74,5 +83,3 @@ if __name__ == '__main__':
         uvicorn.run("__main__:app", port=80, host="0.0.0.0", reload=True)
     else:
         uvicorn.run(app, port=80, host="0.0.0.0")
-
-
