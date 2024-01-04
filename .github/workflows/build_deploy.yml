@@ -1,6 +1,8 @@
 name : Build and Deploy 
 
-on: 
+on:  
+  pull_request: 
+    branches: [ dev, qas, stg, main ]
   workflow_dispatch:
     inputs:
       deploy_at:
@@ -40,6 +42,9 @@ jobs :
         repository : ${{env.GH_REPO}}
         ref        : ${{github.event.inputs.deploy_at}}
      
+    #- name: Generate DOCKER_TAG
+    #  run: echo DKR_TAG='${{github.ref_name}}-${{github.sha}}' >> $GITHUB_ENV
+      
     - name : Build and push to registry 
       id   : container-registry
       uses : mr-smithers-excellent/docker-build-push@v5.5
