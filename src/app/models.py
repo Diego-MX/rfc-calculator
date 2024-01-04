@@ -1,9 +1,12 @@
-from pydantic import BaseModel
-from fastapi.responses import JSONResponse
 from typing import Optional, ClassVar, Dict, Any
-from orjson import dumps
+
+from fastapi.responses import JSONResponse
+from orjson import dumps            # pylint: disable=no-name-in-module
+from pydantic import BaseModel      # pylint: disable=no-name-in-module
+
 from src.get_rfc import PersonPhysical
 
+# pylint: disable=too-few-public-methods
 
 class RequestValidation(BaseModel): 
     userRFC: str
@@ -24,9 +27,11 @@ class RFCValidationResponse(BaseModel):
         '-3': ('Error no reconocido', "Tu RFC no se puede determinar"),
         '-4': ('RFC Incompleto', "Tu RFC no contiene homoclave, pero la base es correcta"), 
         '0' : ('Formato', "El formato de tu RFC es incorrecto, ingrésalo nuevamente"), 
-        '1' : ('Dígito verificador', "El último dígito de tu RFC no corresponde, ingrésalo correctamente"), 
+        '1' : ('Dígito verificador', 
+               "El último dígito de tu RFC no corresponde, ingrésalo correctamente"), 
         '2' : ('Homoclave', "La homoclave de tu RFC no coincide, ingrésala nuevamente"), 
-        '3' : ('Fecha de nacimiento', "La fecha de nacimiento de tu RFC no coincide, ingrésala nuevamente"), 
+        '3' : ('Fecha de nacimiento', 
+               "La fecha de nacimiento de tu RFC no coincide, ingrésala nuevamente"), 
         '4' : ('Iniciales', "Las iniciales de tu RFC no corresponden, ingrésalas nuevamente")}
     
     @classmethod
@@ -49,5 +54,3 @@ class ORJSONResponse(JSONResponse):
 
     def render(self, content: Any) -> bytes:
         return dumps(content)
-
-

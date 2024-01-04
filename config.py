@@ -5,12 +5,13 @@ SITE = Path(__file__).parent if '__file__' in globals() else Path(os.getcwd())
 
 ENV     = os.getenv('ENV_TYPE', 'local') 
 SERVER  = os.getenv('SERVER_TYPE')
-VERSION = '1.0.40'   # BUILD_DEPLOY, line 13.  
+VERSION = '1.0.41'   # BUILD_DEPLOY, line 13.  
 
 
 # Estos son los endpoints finales para hacer pruebas. 
 URLS = {
     'local'   : 'http://localhost:80', 
+    'dev'     : 'http://localhost:80', 
     'staging' : 'https://wap-validation-services-dev.azurewebsites.net',
     'qa'      : 'https://apim-crosschannel-tech-dev.azure-api.net/data/validation-services/v1'
 }
@@ -68,6 +69,3 @@ PATH_DIRS = {
 
 # Este se usa para correr tests. 
 DEFAULT_ENV = 'dev'
-
-
-

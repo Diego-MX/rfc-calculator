@@ -1,85 +1,62 @@
-import re
-from operator import itemgetter
 from datetime import datetime as dt
-import pandas as pd
+from operator import itemgetter
+import re
+
 from fastapi import status, Response
 from fastapi.exceptions import HTTPException
+import pandas as pd
 
 from src.utilities.basic import str_delatinize
 from src.get_rfc import rfc_completo, PersonPhysical
 from src.app.models import RFCValidationResponse
 
 
-
-def process_rfc_physical(an_input): 
-    try: 
-        a_person   = an_input.get('personPhysical')
-        campos_ls  = ['last_name', 'maternal_last_name', 'first_name']
-        nombres_ls = itemgetter(*campos_ls)(a_person)
-        f_inicio   = dt.strptime(a_person.get('date_of_birth'), '%Y-%m-%d')
-        el_rfc     = rfc_completo('fisica', nombres_ls, f_inicio)
-        return {'rfc' : el_rfc}
-
-    except ValueError: 
-        the_exception = HTTPException(status_code=400, 
-                detail="dateOfBirth: Incorrect data fromat, use YYYY-MM-DD")
-        raise the_exception
-    except Exception as expt: 
-        raise HTTPException(status_code=500, detail=str(expt))
-
-
-def process_rfc_physical_2(person): 
+def process_rfc_physical_2(person: PersonPhysical): 
     try: 
         the_rfc = person.get_rfc()
         return {'rfc' : the_rfc}
-    except ValueError: 
+    except ValueError as expt: 
         the_exception = HTTPException(status_code=400, 
                 detail="dateOfBirth: Incorrect data fromat, use YYYY-MM-DD")
-        raise the_exception
+        raise the_exception from expt
     except Exception as expt: 
-        raise HTTPException(status_code=500, detail=str(expt))
+        raise HTTPException(status_code=500, detail=str(expt)) from expt
 
 
-def validate_rfc_physical(req_validation, response:Response): 
+def validate_rfc_physical(req_validation, response: Response): 
     try:
         rfc_user = req_validation.userRFC
         rfc_engine = req_validation.calculatedRFC
-
         okay_keys = PersonPhysical.validate_rfc(rfc_user, rfc_engine)
-        
-        if all(okay_keys[:-1]):  # except last one. 
+        if all(okay_keys[:-1]):
             index = -1
         elif okay_keys[-1]: 
             index = -4
         else:
             index = -2
-
-        if index != -2: 
-            return RFCValidationResponse.from_key(index)
-        else: 
             response.status_code = status.HTTP_409_CONFLICT
             return response
-
+        return RFCValidationResponse.from_key(index)        
     except Exception as expt: 
-        raise HTTPException(status_code=500, detail=str(expt))
+        raise HTTPException(status_code=500, detail=str(expt)) from expt
 
 
-def process_curp(person_obj: PersonPhysical):
+def process_curp(person_obj:PersonPhysical):
     try:
         the_curp = person_obj.get_curp()
         return {'curp': the_curp}
-    except AttributeError: 
-        raise HTTPException(status_code=500, 
-            detail='Must include stateOfBirth, gender.')
+    except AttributeError as expt: 
+        e_detail = 'Must include stateOfBirth, gender.'
+        raise HTTPException(status_code=500, detail=e_detail) from expt 
     except Exception as expt: 
-        raise HTTPException(status_code=500, detail=str(expt))
+        raise HTTPException(status_code=500, detail=str(expt)) from expt
 
 
-def approve_alias(an_alias): 
+def approve_alias(an_alias:str): 
     try: 
         offensive_df  = pd.read_feather('refs/temp/offensive-words.feather').dropna()
         offensive_srs = offensive_df['Phrase'].str.lower().apply(str_delatinize)
-
+        
         offensive_str_2 = '|'.join(offensive_srs.tolist())
         offensive_str_1 = re.sub(r' ?\((.*?)\)', r'|\1', offensive_str_2)
         offensive_str   = rf'({(offensive_str_1)})'
@@ -95,7 +72,24 @@ def approve_alias(an_alias):
                 'offense'     : offense, 
                 'offenseType' : which_offensive}) 
         return response
-
     except Exception as expt: 
-        raise HTTPException(status_code=500, detail=str(expt))
+        raise HTTPException(status_code=500, detail=str(expt)) from expt
         
+
+def process_rfc_physical(an_input):
+    # Legacy Request.  
+    try: 
+        a_person   = an_input.get('personPhysical')
+        campos_ls  = ['last_name', 'maternal_last_name', 'first_name']
+        nombres_ls = itemgetter(*campos_ls)(a_person)
+        f_inicio   = dt.strptime(a_person.get('date_of_birth'), '%Y-%m-%d')
+        el_rfc     = rfc_completo('fisica', nombres_ls, f_inicio)
+        return {'rfc' : el_rfc}
+
+    except ValueError as exc: 
+        the_exception = HTTPException(status_code=400, 
+                detail="dateOfBirth: Incorrect data fromat, use YYYY-MM-DD")
+        raise the_exception from exc
+    except Exception as exc: 
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+

@@ -2,12 +2,14 @@
 from datetime import datetime as dt, date
 from enum import Enum
 from functools import partial
+from operator import methodcaller as ϱ
 import re 
 from typing import Optional
 
-from pydantic import BaseModel, Field
-from src.utilities.basic import (compose_ls, arg0_to_end, 
-    str_iconv, str_multisub)
+from pydantic import BaseModel, Field   # pylint: disable=no-name-in-module
+from toolz import compose, compose_left, pipe
+from toolz.curried import map as map_z
+from src.utilities.basic import partial2, str_iconv, str_multisub
 
 
 #%% Aux variables
@@ -27,31 +29,29 @@ CHARS_6 = '0987654321'
 
 
 INCONVENIENTS = { 
-    'RFC':   ("BUEI, BUEY, CACA, CACO, CAGA, CAGO, CAKA, COGE, COJA, COJI, " + 
-        "COJO, CULO, FETO, GUEY, JOTO, KACA, KACO, KAGA, KAGO, KOGE, KOJO, " + 
-        "KAKA, KULO, MAME, MAMO, MEAR, MEON, MION, MOCO, MULA, PEDA, PEDO, " + 
+    'RFC':   ("BUEI, BUEY, CACA, CACO, CAGA, CAGO, CAKA, COGE, COJA, COJI, "  
+        "COJO, CULO, FETO, GUEY, JOTO, KACA, KACO, KAGA, KAGO, KOGE, KOJO, "  
+        "KAKA, KULO, MAME, MAMO, MEAR, MEON, MION, MOCO, MULA, PEDA, PEDO, "  
         "PENE, PUTA, PUTO, QULO, RATA, RUIN"
         ).split(', '),   # 38 words
-    'CURP':  ("BACA, BAKA, BUEI, BUEY, CACA, CACO, CAGA, CAGO, CAKA, CAKO, " +  
-        "COGE, COGI, COJA, COJE, COJI, COJO, COLA, CULO, FALO, FETO, GETA, " +  
-        "GUEI, GUEY, JETA, JOTO, KACA, KACO, KAGA, KAGO, KAKA, KAKO, KOGE, " +  
-        "KOGI, KOJA, KOJE, KOJI, KOJO, KOLA, KULO, LILO, LOCA, LOCO, LOKA, " +  
-        "LOKO, MAME, MAMO, MEAR, MEAS, MEON, MIAR, MION, MOCO, MOKO, MULA, " +  
-        "MULO, NACA, NACO, PEDA, PEDO, PENE, PIPI, PITO, POPO, PUTA, PUTO, " +  
-        "QULO, RATA, ROBA, ROBE, ROBO, RUIN, SENO, TETA, VACA, VAGA, VAGO, " +  
+    'CURP':  ("BACA, BAKA, BUEI, BUEY, CACA, CACO, CAGA, CAGO, CAKA, CAKO, "   
+        "COGE, COGI, COJA, COJE, COJI, COJO, COLA, CULO, FALO, FETO, GETA, "   
+        "GUEI, GUEY, JETA, JOTO, KACA, KACO, KAGA, KAGO, KAKA, KAKO, KOGE, "   
+        "KOGI, KOJA, KOJE, KOJI, KOJO, KOLA, KULO, LILO, LOCA, LOCO, LOKA, "   
+        "LOKO, MAME, MAMO, MEAR, MEAS, MEON, MIAR, MION, MOCO, MOKO, MULA, "   
+        "MULO, NACA, NACO, PEDA, PEDO, PENE, PIPI, PITO, POPO, PUTA, PUTO, "   
+        "QULO, RATA, ROBA, ROBE, ROBO, RUIN, SENO, TETA, VACA, VAGA, VAGO, "   
         "VAKA, VUEI, VUEY, WUEI, WUEY"
         ).split(', ') }  # 81 words
 
 IGNORE_WORDS = {
-    'RFC': ("EL, LA, DE, S DE RL, SA DE CV, DE, LOS, LAS, Y, MC, DEL, SA, "
-        "COMPAÑIA, CIA, SOCIEDAD, SOC, COOPERATIVA, COOP, S EN C POR A, "
-        "A EN P, MAC, S EN NC, S EN C, VAN, PARA, EN, MI, POR, CON, AL, SUS, "
-        "E, SC, SCL, SCS, SNC, THE, OF, AND, COMPANY, CO, MC, MI, A, SRL CV, "
-        "SA DE CV MI, SA MI, COMPA.IA, SRL CV MI, SRL MI"
-        ).split(', '), 
-    'CURP' : ("DA, DAS, DE, DEL, DER, DI, DIE, DD, EL, LA, LOS, LAS, LE, "
-        "LES, MAC, MC, VAN, VON, Y"
-        ).split(', ') }
+    'RFC': ("EL,LA,DE,S DE RL,SA DE CV,DE,LOS,LAS,Y,MC,DEL,SA,COMPAÑIA,CIA,"
+        "SOCIEDAD,SOC,COOPERATIVA,COOP,S EN C POR A,A EN P,MAC,S EN NC,S EN C,"
+        "VAN,PARA,EN,MI,POR,CON,AL,SUS,E,SC,SCL,SCS,SNC,THE,OF,AND,COMPANY,CO,"
+        "MC,MI,A,SRL CV,SA DE CV MI,SA MI,COMPA.IA,SRL CV MI,SRL MI"
+        ).split(','),
+    'CURP': ("DA,DAS,DE,DEL,DER,DI,DIE,DD,EL,LA,LOS,LAS,LE,LES,MAC,MC,VAN,VON,Y"
+        ).split(',')}
 
 IGNORE_CHARS = {
     'RFC'   : '´\'.', 
@@ -62,31 +62,31 @@ NAZARENES = ['MARIA', 'JOSE', 'MA', 'MAXX']  # Last entry MAXX is used for MA,
     # when modified with some rules. 
 
 # These codes assume the Mexican State name. 
-states_str = ("Aguascalientes:AS, Baja California:BC, Baja California Sur:BS, " 
-    "Campeche:CC, Chiapas:CS, Chihuahua:CH, Ciudad de México:DF, Coahuila:CL, "
-    "Colima:CM, Durango:DG, Guanajuato:GT, Guerrero:GR, Hidalgo:HG, Jalisco:JC, "
-    "Edo. México:MC, Morelos:MS, Nayarit:NT, Nuevo León:NL, Oaxaca:OC, Puebla:PL, " 
-    "Querétaro:QO, Quintana Roo:QR, San Luis Potosí:SP, Sinaloa:SL, Sonora:SR, " 
-    "Tabasco:TC, Tamaulipas:TS, Tlaxcala:TL, Veracruz:VZ, Yucatán:YN, Zacatecas:ZS")
+STATES_STR = ("Aguascalientes:AS,Baja California:BC,Baja California Sur:BS," 
+    "Campeche:CC,Chiapas:CS,Chihuahua:CH,Ciudad de México:DF,Coahuila:CL,"
+    "Colima:CM,Durango:DG,Guanajuato:GT,Guerrero:GR,Hidalgo:HG,Jalisco:JC,"
+    "Edo. México:MC,Morelos:MS,Nayarit:NT,Nuevo León:NL,Oaxaca:OC,Puebla:PL," 
+    "Querétaro:QO,Quintana Roo:QR,San Luis Potosí:SP,Sinaloa:SL,Sonora:SR," 
+    "Tabasco:TC,Tamaulipas:TS,Tlaxcala:TL,Veracruz:VZ,Yucatán:YN,Zacatecas:ZS")
 
-states_dict = dict(state.split(':') for state in states_str.split(', '))
-states_inv  = {abr: name for (name, abr) in states_dict.items()}
-State = Enum('State', states_inv)
-# Still understanding the use of ENUM type
+State = pipe(STATES_STR, 
+    ϱ('split', ','), 
+    map_z(ϱ('split', ':')), 
+    map_z(reversed), 
+    partial(Enum, 'State'))
 
 
 # And now some auxiliary functions. 
-compose_apply = lambda x, fn_ls: list(map(compose_ls(fn_ls), x))
 
-str_normalize = partial(arg0_to_end(str_iconv), 'ÁÉÍÓÚÜ', 'AEIOUU')
-str_spacing = compose_ls([partial(re.sub, ' +', ' '), str.strip])
+str_normalize = partial2(str_iconv, ..., 'ÁÉÍÓÚÜ', 'AEIOUU')
+str_spacing = compose(str.strip, partial2(re.sub, ' +', ' ', ...))
 
 has_match = lambda a_str, a_reg: re.match(a_reg, a_str) is not None
 
-def valid_datestring(dt_str:str, format='%y%m%d') -> bool: 
-    # Not the most elegant way ... but who cares about elegance these days. 
+
+def valid_datestring(dt_str:str, date_format='%y%m%d') -> bool: 
     try: 
-        _date = dt.strptime(dt_str, format)
+        _date = dt.strptime(dt_str, date_format)
         is_it = True
     except ValueError:
         is_it = False
@@ -97,13 +97,11 @@ def valid_datestring(dt_str:str, format='%y%m%d') -> bool:
 #%% The Real Models.  
 
 class Gender(str, Enum): 
-    # Also not sure if this is entirely correct. 
     HOMBRE = 'H'
     MUJER = 'M'
 
 
 class PersonPhysical(BaseModel): 
-    # Alias is for use when used with other APP. 
     # person_type      : Literal['Physical']
     first_name         : str = Field(alias='firstName')
     last_name          : Optional[str] = Field(alias='lastName')
@@ -111,10 +109,8 @@ class PersonPhysical(BaseModel):
     date_of_birth      : Optional[date] = Field(alias='dateOfBirth') 
     state_of_birth     : Optional[State] = Field(alias='stateOfBirth')
     gender             : Optional[Gender]
-    # Construct with ALIAS, returns standard attribute. 
-    # To return alias:  person_obj.dict(by_alias=True)
 
-    def get_rfc(self):
+    def get_rfc(self) -> str:
         extras = self.get_helpers(mode='RFC')
         rfc_0 = self.get_initials(extras, mode='RFC')
         rfc_1 = rfc_0 + self.date_of_birth.strftime('%y%m%d')
@@ -122,8 +118,7 @@ class PersonPhysical(BaseModel):
         rfc_3 = rfc_2 + self.get_verificator(rfc_2, mode='RFC') 
         return rfc_3
 
-
-    def get_curp(self): 
+    def get_curp(self) -> str: 
         extras = self.get_helpers(mode='CURP')
         curp_0 = self.get_initials(extras, mode='CURP')
         curp_1 = self.date_of_birth.strftime('%y%m%d')
@@ -138,25 +133,28 @@ class PersonPhysical(BaseModel):
     def get_helpers(self, mode):
         sub_chars = {'RFC': '', 'CURP': 'XX'} 
         
-        dict_chars = dict((c_char, sub_chars[mode]) for c_char in IGNORE_CHARS[mode])
-        str_chars = partial(str_multisub, sub_dict=dict_chars, escape=True)
+        str_chars = partial2(str_multisub, escape=True,
+            sub_dict=dict.fromkeys(IGNORE_CHARS[mode], sub_chars[mode]))
         
-        reg_stopwds = dict((rf'\b{word}\b', ' ') for word in IGNORE_WORDS[mode])
-        str_stopwds = partial(str_multisub, sub_dict=reg_stopwds, escape=False)
+        ignore_regs = list(map(r'\b{}\b'.format, IGNORE_WORDS[mode]) )
+        str_stopwds = partial2(str_multisub, escape=True, 
+            sub_dict=dict.fromkeys(ignore_regs, value=' '))
         
         names_list = [self.last_name, self.maternal_last_name, self.first_name]
-        names_0 = compose_apply(names_list, [str.upper, str_chars, str_normalize])
-        names_1 = [ re.sub(r'^(MA?C|VAN)', r'\1 ', e_name) for e_name in names_0 ]
-        names_str = str_spacing(' '.join(names_1))
-        names_2 = compose_apply(names_1, [str_stopwds, str_spacing])
+        pre_names = pipe(names_list, 
+            map_z(compose_left(str_normalize, str_chars, str.upper)),
+            map_z(partial2(re.sub(r'^(MA?C|VAN)', r'\1', ...))), 
+            ' '.join, str_spacing)
 
+        names_str = str_spacing(' '.join(pre_names))
+        names_2 = pipe(pre_names, map_z(str_stopwds), map_z(str_spacing), list)
 
         firstnames_ls = names_2[2].split(' ')
-        use_first     = (len(firstnames_ls) == 1) | (firstnames_ls[0] not in NAZARENES)
+        use_first = (len(firstnames_ls) == 1) | (firstnames_ls[0] not in NAZARENES)
         one_firstname = firstnames_ls[0] if use_first else firstnames_ls[1]
 
         lastnames = names_2[:2]        
-        if mode == 'CURP':  # Compound last names use only the first one. 
+        if mode == 'CURP': 
             lastnames = [each_name.split(' ')[0] for each_name in lastnames]
             names_2[:2] = lastnames
 
@@ -215,6 +213,7 @@ class PersonPhysical(BaseModel):
         return initials
 
 
+    @classmethod
     def get_second_consonants(cls, helpers): 
         
         def inner_consonant(x_str):
@@ -228,12 +227,10 @@ class PersonPhysical(BaseModel):
 
         the_consts_1 = ''.join(map(inner_consonant, 
                 [lastname_1, m_lastname, firstname_0]) )
-
-        the_consts = re.sub('Ñ', 'X', the_consts_1)
+        return re.sub('Ñ', 'X', the_consts_1)
         
-        return the_consts
 
-
+    @classmethod
     def get_homoclave(cls, helpers, mode): 
         if mode == 'RFC': 
             names_str = helpers['names_str']
@@ -250,13 +247,13 @@ class PersonPhysical(BaseModel):
             #   so that C_i = INT_LIST[i+1] in the expression above. 
             sum_1000 = sum(sum_terms) % 1000
             (quotient, residue) = (sum_1000 // 34, sum_1000 % 34)
-            homoclave = (CHARS_2[quotient] + CHARS_2[residue])
+            a_homoclave = (CHARS_2[quotient] + CHARS_2[residue])
 
         elif mode == 'CURP': 
             before_2000 = helpers['date_of_birth'] < date(2000, 1, 1)
-            homoclave = '0' if before_2000 else 'A'
+            a_homoclave = '0' if before_2000 else 'A'
 
-        return homoclave
+        return a_homoclave
 
 
     @classmethod
@@ -293,7 +290,6 @@ class PersonPhysical(BaseModel):
         
         okay_05 = has_match(rfc_1, r"^[A-Z]{3,4}[0-9]{6}$")
         
-
         # Initial validator.   
         okays[0] = (okay_01 and okay_02 and okay_03)
         # Verificator digit validator.  
@@ -310,7 +306,6 @@ class PersonPhysical(BaseModel):
         okays[5] = okay_05 and okays[4] and okays[3]
         return okays
 
-
            
 
 class PersonaFisica:
@@ -321,10 +316,10 @@ class PersonaFisica:
         reg_stopwds = dict((rf'\b{word}\b', ' ') for word in IGNORE_WORDS['RFC'])
         str_stopwds = partial(str_multisub, sub_dict=reg_stopwds, escape=False)
 
-        nombres_0 = compose_apply(nombres_ls, [str_rm_chars, str.upper, str_normalize])
+        nombres_0 = pipe(nombres_ls, str_rm_chars, str.upper, str_normalize)
 
         self.la_cadena = str_spacing(' '.join(nombres_0))
-        self.la_lista = compose_apply(nombres_0, [str_stopwds, str_spacing])
+        self.la_lista = compose(nombres_0, str_stopwds, str_spacing)
         
         self.identificar_elementos()
         
@@ -368,8 +363,6 @@ class PersonaFisica:
         elif modo == 'CURP': 
             pass
             
-        self.iniciales = initials
-
         return initials
 
 
@@ -399,7 +392,6 @@ def rfc_inicial(tipo: str, nombres_obj: PersonaFisica) -> str:
     # INPUTS como arriba; 
     # -> INICIALES   : cuatro letras
     # -> NOMBRES_STR : nombres concatenados
-    nombres_obj
     if tipo == 'fisica':  
         iniciales = nombres_obj.obtener_iniciales(modo='RFC')
 
