@@ -4,6 +4,10 @@ from re import sub as str_sub, escape as re_escape
 from unidecode import unidecode 
 
 
+def constant(yy): 
+    return lambda xx: yy
+
+
 def move_args(func, k): 
     """Change k argument to last position."""
     @wraps(func)
@@ -13,32 +17,13 @@ def move_args(func, k):
         return func(*args)
     return new_func
 
-
-def compose_0(x): 
-    return x
  
 def eval_func(func, *args, **kwargs): 
     return func(*args, **kwargs)
 
-def compose_2(inner, outer): 
-    return (lambda x: outer(inner(x)))
-
-compose_ls = partial(move_args(reduce, 1), compose_2, compose_0)
 
 arg0_to_end = partial(move_args, k=0)
 
-
-def method_as_func(method, *args):
-    '''Change the order of the arguments: 
-    For an object X with method M its evaluation 
-    X.M(*args) is called as METHOD_AS_FUNC(M, *args)(X)
-    '''
-    # Pretty challenge to resolve this with functionals, instead of lambdas.
-    # the_function = lambda x: x.method(*args)
-    the_function = compose_2(
-        partial(arg0_to_end(getattr), method), 
-        partial(arg0_to_end(eval_func), *args))
-    return the_function
 
 
 def str_multisub(x_str, sub_dict, escape=False): 

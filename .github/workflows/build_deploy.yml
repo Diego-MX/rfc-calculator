@@ -1,8 +1,6 @@
 name : Build and Deploy 
 
-on:  
-  pull_request: 
-    branches: [ dev, qas, stg, main ]
+on: 
   workflow_dispatch:
     inputs:
       deploy_at:
@@ -42,9 +40,6 @@ jobs :
         repository : ${{env.GH_REPO}}
         ref        : ${{github.event.inputs.deploy_at}}
      
-    #- name: Generate DOCKER_TAG
-    #  run: echo DKR_TAG='${{github.ref_name}}-${{github.sha}}' >> $GITHUB_ENV
-      
     - name : Build and push to registry 
       id   : container-registry
       uses : mr-smithers-excellent/docker-build-push@v5.5
@@ -60,7 +55,8 @@ jobs :
     - name : Deploy to App Service
       uses : azure/webapps-deploy@v2
       with :
-        images  : '${{secrets.ACR_HOST}}/${{env.DKR_IMAGE}}:${{env.DKR_TAG}}-${{github.event.inputs.deploy_at}}'
+        images : '${{secrets.ACR_HOST}}/${{env.DKR_IMAGE}}:${{env.DKR_TAG}}-${{github.event.inputs.deploy_at}}'
         app-name : ${{env.WAP_NAME}}
+        slot-name : ${{env.WAP_SLOT}}
         publish-profile : ${{secrets.WAP_PUBLISH}}
        
