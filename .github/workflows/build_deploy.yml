@@ -61,6 +61,6 @@ jobs :
       with :
         images : '${{secrets.ACR_HOST}}/${{env.DKR_IMAGE}}:${{env.DKR_TAG}}-${{github.event.inputs.deploy_at}}'
         app-name : ${{env.WAP_NAME}}
-        slot-name : ${{env.WAP_SLOT}}
+        slot-name : ${{secrets.WAP_SLOT}}
         publish-profile : ${{secrets.WAP_PUBLISH}}
        
