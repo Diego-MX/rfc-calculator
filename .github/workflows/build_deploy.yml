@@ -32,6 +32,8 @@ jobs :
             echo "WAP_NAME=as-validationServices-adm-stg"  >> $GITHUB_ENV;;
           "prd")
             echo "WAP_NAME=as-validationServices-data-prd" >> $GITHUB_ENV;;
+          "prd2")
+            echo "WAP_NAME=as-validationServices-data-prd" >> $GITHUB_ENV;;
           "drp")
             echo "WAP_NAME=as-validationServices-data-drp" >> $GITHUB_ENV;;
         esac
