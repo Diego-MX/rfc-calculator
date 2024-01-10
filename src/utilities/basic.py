@@ -1,30 +1,8 @@
 
-from functools import reduce, partial, wraps
+from functools import reduce, partial
 from re import sub as str_sub, escape as re_escape
 from unidecode import unidecode 
-
-
-def constant(yy): 
-    return lambda xx: yy
-
-
-def move_args(func, k): 
-    """Change k argument to last position."""
-    @wraps(func)
-    def new_func(*new_args): 
-        args = list(new_args)
-        args.insert(k, args.pop())
-        return func(*args)
-    return new_func
-
  
-def eval_func(func, *args, **kwargs): 
-    return func(*args, **kwargs)
-
-
-arg0_to_end = partial(move_args, k=0)
-
-
 
 def str_multisub(x_str, sub_dict, escape=False): 
     if escape: 

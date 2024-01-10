@@ -11,7 +11,7 @@ on:
 env :
   GH_REPO   : Bineo2/data-functions
   DKR_IMAGE : data-functions-wap
-  DKR_TAG   : '1.0.42'
+  DKR_TAG   : '1.0.43'
 
 jobs :
   build-and-deploy :
@@ -27,6 +27,8 @@ jobs :
           "qas")
             echo "WAP_NAME=as-validationServices-data-qas" >> $GITHUB_ENV;;
           "stg")
+            echo "WAP_NAME=as-validationServices-adm-stg"  >> $GITHUB_ENV;;
+          "stg2")
             echo "WAP_NAME=as-validationServices-adm-stg"  >> $GITHUB_ENV;;
           "prd")
             echo "WAP_NAME=as-validationServices-data-prd" >> $GITHUB_ENV;;
@@ -44,13 +46,13 @@ jobs :
       id   : container-registry
       uses : mr-smithers-excellent/docker-build-push@v5.5
       with : 
+        dockerfile : dockerfile.ci
         registry   : ${{secrets.ACR_HOST}}
         username   : ${{secrets.ACR_USERNAME}}
         password   : ${{secrets.ACR_PASSWORD}}
-        dockerfile : dockerfile.ci
         image      : ${{env.DKR_IMAGE}}
         tags       : ${{env.DKR_TAG}}-${{github.event.inputs.deploy_at}}
-        buildArgs  : ENV_TYPE=${{github.event.inputs.deploy_at}},SERVER_TYPE=wap
+        buildArgs  : SERVER_TYPE=wap,ENV_TYPE=${{github.event.inputs.deploy_at}}
         
     - name : Deploy to App Service
       uses : azure/webapps-deploy@v2
