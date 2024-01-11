@@ -138,7 +138,7 @@ class PersonPhysical(BaseModel):
         
         ignore_regs = list(map(r'\b{}\b'.format, IGNORE_WORDS[mode]) )
         str_stopwds = partial2(str_multisub, escape=True, 
-            sub_dict=dict.fromkeys(ignore_regs, value=' '))
+            sub_dict=dict.fromkeys(ignore_regs, ' '))
         
         names_list = [self.last_name, self.maternal_last_name, self.first_name]
         pre_names = pipe(names_list, 
