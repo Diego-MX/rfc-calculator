@@ -139,7 +139,7 @@ class PersonPhysical(BaseModel):
         
         names_list = [self.last_name, self.maternal_last_name, self.first_name]
         pre_names = pipe(names_list, 
-            map_z(compose_left(str_normalize, str_chars, str.upper)),
+            map_z(compose(str_normalize, str_chars, str.upper)),
             map_z(partial2(re.sub, r'^(MA?C|VAN)', r'\1', ...)), list)
 
         names_str = str_spacing(' '.join(pre_names))
