@@ -3,24 +3,24 @@ name : Build and Deploy
 on: 
   workflow_dispatch:
     inputs:
-      deploy_at:
-        description: 'Environment to deploy to'
-        required: true
-        default: 'dev'
+      deploy_at :
+        description : 'Environment to deploy to'
+        required : true
+        default : 'dev'
 
 env :
-  GH_REPO   : Bineo2/data-functions
+  GH_REPO : Bineo2/data-functions
   DKR_IMAGE : data-functions-wap
-  DKR_TAG   : '1.0.47'
+  DKR_TAG : '1.0.48'
 
 jobs :
   build-and-deploy :
-    runs-on     : ubuntu-latest
+    runs-on : ubuntu-latest
     environment : ${{github.event.inputs.deploy_at}}
     steps : 
     - name : Set Variables
-      id   : set-variables
-      run  : |
+      id : set-variables
+      run : |
         case "${{github.event.inputs.deploy_at}}" in
           "dev") 
             echo "WAP_NAME=wap-validation-services-dev"    >> $GITHUB_ENV;;

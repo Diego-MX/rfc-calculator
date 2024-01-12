@@ -65,15 +65,13 @@ async def alias_approval(alias: str):
 
 @app.get("/get-rfc", tags=['Legacy'])
 async def rfc_get(a_request: RequestRFC):    
-    an_input = loads(a_request.json())
-    a_response = engine.process_rfc_physical(an_input)
+    a_response = engine.process_rfc_physical_2(a_request.personPhysical)
     return a_response
 
 
 @app.post("/get-rfc", tags=['Legacy'])
 async def rfc_post(a_request: RequestRFC):    
-    an_input = loads(a_request.json())
-    a_response = engine.process_rfc_physical(an_input)
+    a_response = engine.process_rfc_physical_2(a_request.personPhysical)
     return a_response
     
 

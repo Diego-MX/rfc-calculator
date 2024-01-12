@@ -82,9 +82,5 @@ def process_rfc_physical(an_input):
         el_rfc     = rfc_completo('fisica', nombres_ls, f_inicio)
         return {'rfc' : el_rfc}
 
-    except ValueError as exc: 
-        the_exception = HTTPException(status_code=400, 
-                detail="dateOfBirth: Incorrect data fromat, use YYYY-MM-DD")
-        raise the_exception from exc
     except Exception as exc: 
         raise HTTPException(status_code=500, detail=str(exc)) from exc
