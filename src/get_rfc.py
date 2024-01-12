@@ -29,20 +29,17 @@ CHARS_6 = '0987654321'
 
 
 INCONVENIENTS = { 
-    'RFC':   ("BUEI, BUEY, CACA, CACO, CAGA, CAGO, CAKA, COGE, COJA, COJI, "  
-        "COJO, CULO, FETO, GUEY, JOTO, KACA, KACO, KAGA, KAGO, KOGE, KOJO, "  
-        "KAKA, KULO, MAME, MAMO, MEAR, MEON, MION, MOCO, MULA, PEDA, PEDO, "  
-        "PENE, PUTA, PUTO, QULO, RATA, RUIN"
-        ).split(', '),   # 38 words
-    'CURP':  ("BACA, BAKA, BUEI, BUEY, CACA, CACO, CAGA, CAGO, CAKA, CAKO, "   
-        "COGE, COGI, COJA, COJE, COJI, COJO, COLA, CULO, FALO, FETO, GETA, "   
-        "GUEI, GUEY, JETA, JOTO, KACA, KACO, KAGA, KAGO, KAKA, KAKO, KOGE, "   
-        "KOGI, KOJA, KOJE, KOJI, KOJO, KOLA, KULO, LILO, LOCA, LOCO, LOKA, "   
-        "LOKO, MAME, MAMO, MEAR, MEAS, MEON, MIAR, MION, MOCO, MOKO, MULA, "   
-        "MULO, NACA, NACO, PEDA, PEDO, PENE, PIPI, PITO, POPO, PUTA, PUTO, "   
-        "QULO, RATA, ROBA, ROBE, ROBO, RUIN, SENO, TETA, VACA, VAGA, VAGO, "   
-        "VAKA, VUEI, VUEY, WUEI, WUEY"
-        ).split(', ') }  # 81 words
+    'RFC':  ("BUEI,BUEY,CACA,CACO,CAGA,CAGO,CAKA,COGE,COJA,COJI,COJO,CULO,FETO,"
+        "GUEY,JOTO,KACA,KACO,KAGA,KAGO,KOGE,KOJO,KAKA,KULO,MAME,MAMO,MEAR,MEON,"
+        "MION,MOCO,MULA,PEDA,PEDO,PENE,PUTA,PUTO,QULO,RATA,RUIN"
+        ).split(','),  # 38 words
+    'CURP': ("BACA,BAKA,BUEI,BUEY,CACA,CACO,CAGA,CAGO,CAKA,CAKO,COGE,COGI,COJA,"
+        "COJE,COJI,COJO,COLA,CULO,FALO,FETO,GETA,GUEI,GUEY,JETA,JOTO,KACA,KACO,"
+        "KAGA,KAGO,KAKA,KAKO,KOGE,KOGI,KOJA,KOJE,KOJI,KOJO,KOLA,KULO,LILO,LOCA,"
+        "LOCO,LOKA,LOKO,MAME,MAMO,MEAR,MEAS,MEON,MIAR,MION,MOCO,MOKO,MULA,MULO,"
+        "NACA,NACO,PEDA,PEDO,PENE,PIPI,PITO,POPO,PUTA,PUTO,QULO,RATA,ROBA,ROBE,"
+        "ROBO,RUIN,SENO,TETA,VACA,VAGA,VAGO,VAKA,VUEI,VUEY,WUEI,WUEY"
+        ).split(',') }  # 81 words
 
 IGNORE_WORDS = {
     'RFC': ("EL,LA,DE,S DE RL,SA DE CV,DE,LOS,LAS,Y,MC,DEL,SA,COMPAÑIA,CIA,"
@@ -143,8 +140,7 @@ class PersonPhysical(BaseModel):
         names_list = [self.last_name, self.maternal_last_name, self.first_name]
         pre_names = pipe(names_list, 
             map_z(compose_left(str_normalize, str_chars, str.upper)),
-            map_z(partial2(re.sub(r'^(MA?C|VAN)', r'\1', ...))), 
-            ' '.join, str_spacing)
+            map_z(partial2(re.sub, r'^(MA?C|VAN)', r'\1', ...)), list)
 
         names_str = str_spacing(' '.join(pre_names))
         names_2 = pipe(pre_names, map_z(str_stopwds), map_z(str_spacing), list)
