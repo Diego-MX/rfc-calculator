@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+
+# pylint: disable=no-name-in-module
+
 from datetime import datetime as dt, date
 from enum import Enum
 from functools import partial
@@ -6,16 +9,11 @@ from operator import methodcaller as ϱ
 import re 
 from typing import Optional
 
-from pydantic import BaseModel, Field   # pylint: disable=no-name-in-module
-from toolz import compose, compose_left, pipe
+from pydantic import BaseModel, Field   
+from toolz import compose, pipe
 from toolz.curried import map as map_z
 from src.utilities.basic import partial2, str_iconv, str_multisub
 
-
-#%% Aux variables
-
-# These keys are defined in the corresponding documentation for RFC and CURP.
-# Spaces and tildes are used as place-holders on purpose. 
 
 # RFC
 CHARS_1 = ' 123456789&ABCDEFGHI~JKLMNOPQR~~STUVWXYZÑ' 
@@ -32,14 +30,14 @@ INCONVENIENTS = {
     'RFC':  ("BUEI,BUEY,CACA,CACO,CAGA,CAGO,CAKA,COGE,COJA,COJI,COJO,CULO,FETO,"
         "GUEY,JOTO,KACA,KACO,KAGA,KAGO,KOGE,KOJO,KAKA,KULO,MAME,MAMO,MEAR,MEON,"
         "MION,MOCO,MULA,PEDA,PEDO,PENE,PUTA,PUTO,QULO,RATA,RUIN"
-        ).split(','),  # 38 words
+        ).split(','),  # 38 palabras
     'CURP': ("BACA,BAKA,BUEI,BUEY,CACA,CACO,CAGA,CAGO,CAKA,CAKO,COGE,COGI,COJA,"
         "COJE,COJI,COJO,COLA,CULO,FALO,FETO,GETA,GUEI,GUEY,JETA,JOTO,KACA,KACO,"
         "KAGA,KAGO,KAKA,KAKO,KOGE,KOGI,KOJA,KOJE,KOJI,KOJO,KOLA,KULO,LILO,LOCA,"
         "LOCO,LOKA,LOKO,MAME,MAMO,MEAR,MEAS,MEON,MIAR,MION,MOCO,MOKO,MULA,MULO,"
         "NACA,NACO,PEDA,PEDO,PENE,PIPI,PITO,POPO,PUTA,PUTO,QULO,RATA,ROBA,ROBE,"
         "ROBO,RUIN,SENO,TETA,VACA,VAGA,VAGO,VAKA,VUEI,VUEY,WUEI,WUEY"
-        ).split(',') }  # 81 words
+        ).split(',') }  # 81 palabras
 
 IGNORE_WORDS = {
     'RFC': ("EL,LA,DE,S DE RL,SA DE CV,DE,LOS,LAS,Y,MC,DEL,SA,COMPAÑIA,CIA,"
@@ -55,10 +53,10 @@ IGNORE_CHARS = {
     'CURP'  : '/-.', 
     'moral' : '@"´%#!.$\'-/+()'}
 
-NAZARENES = ['MARIA', 'JOSE', 'MA', 'MAXX']  # Last entry MAXX is used for MA, 
+NAZARENOS = ['MARIA', 'JOSE', 'MA', 'MAXX']  # Last entry MAXX is used for MA, 
     # when modified with some rules. 
 
-# These codes assume the Mexican State name. 
+# Códigos de los estados unidos mexicanos.
 STATES_STR = ("Aguascalientes:AS,Baja California:BC,Baja California Sur:BS," 
     "Campeche:CC,Chiapas:CS,Chihuahua:CH,Ciudad de México:DF,Coahuila:CL,"
     "Colima:CM,Durango:DG,Guanajuato:GT,Guerrero:GR,Hidalgo:HG,Jalisco:JC,"
@@ -66,18 +64,13 @@ STATES_STR = ("Aguascalientes:AS,Baja California:BC,Baja California Sur:BS,"
     "Querétaro:QO,Quintana Roo:QR,San Luis Potosí:SP,Sinaloa:SL,Sonora:SR," 
     "Tabasco:TC,Tamaulipas:TS,Tlaxcala:TL,Veracruz:VZ,Yucatán:YN,Zacatecas:ZS")
 
-State = pipe(STATES_STR, 
-    ϱ('split', ','), 
-    map_z(ϱ('split', ':')), 
-    map_z(reversed), 
-    partial(Enum, 'State'))
-
+State = Enum('State', [tuple(reversed(edo_kk.split(':'))) 
+    for edo_kk in STATES_STR.split(',')])
 
 # And now some auxiliary functions. 
 
-str_normalize = partial2(str_iconv, ..., 'ÁÉÍÓÚÜ', 'AEIOUU')
-str_spacing = compose(str.strip, partial2(re.sub, ' +', ' ', ...))
-
+str_normalize = lambda xx: str_iconv(xx, 'ÁÉÍÓÚÜ', 'AEIOUU')
+str_spacing = lambda xx: re.sub(' +', ' ', xx).strip()
 has_match = lambda a_str, a_reg: re.match(a_reg, a_str) is not None
 
 
@@ -146,7 +139,7 @@ class PersonPhysical(BaseModel):
         names_2 = pipe(pre_names, map_z(str_stopwds), map_z(str_spacing), list)
 
         firstnames_ls = names_2[2].split(' ')
-        use_first = (len(firstnames_ls) == 1) | (firstnames_ls[0] not in NAZARENES)
+        use_first = (len(firstnames_ls) == 1) | (firstnames_ls[0] not in NAZARENOS)
         one_firstname = firstnames_ls[0] if use_first else firstnames_ls[1]
 
         lastnames = names_2[:2]        
@@ -214,7 +207,7 @@ class PersonPhysical(BaseModel):
         
         def inner_consonant(x_str):
             consts = 'BCDFGHJKLMNÑPQRSTVWXYZ'
-            x_consts = list(filter(lambda letter: letter in consts, x_str[1:]))
+            x_consts = list(filter(lambda letter:letter in consts, x_str[1:]))
             return x_consts[0] if x_consts else 'X'
         
         lastname_1 = helpers['one_lastname'][1]
@@ -231,7 +224,7 @@ class PersonPhysical(BaseModel):
         if mode == 'RFC': 
             names_str = helpers['names_str']
             idx_list  = [CHARS_1.index(c_char) for c_char in list(names_str)] 
-            idx_seq   = ['0'] + [f'{c_pos:02}'  for c_pos  in idx_list]
+            idx_seq   = ['0'] + [f'{c_pos:02}' for c_pos  in idx_list]
             int_list  = [int(c_char) for c_char in ''.join(idx_seq)]
             sum_terms = [10*int_list[i]*c_i + c_i**2 
                     for i, c_i in enumerate(int_list[1:])]
@@ -269,7 +262,7 @@ class PersonPhysical(BaseModel):
 
 
     @classmethod
-    def validate_rfc(cls, rfc_1: str, rfc_0: str): 
+    def validate_rfc(cls, rfc_1: str, rfc_0:str): 
         rfc_1 = rfc_1.upper()  # USER
         rfc_0 = rfc_0.upper()  # CALCULATED
 
@@ -325,7 +318,7 @@ class PersonaFisica:
 
         lastnames = the_list[:2]
         the_names = the_list[ 2].split(' ')
-        use_first = (len(the_names) == 1) | (the_names[0] not in NAZARENES)
+        use_first = (len(the_names) == 1) | (the_names[0] not in NAZARENOS)
         
         self.apellido_p = the_list[0]
         self.apellido_m = the_list[1]
@@ -338,10 +331,10 @@ class PersonaFisica:
 
     def obtener_iniciales(self, modo='estandar'):
         if   modo == 'estandar':
-            initials = list(map(lambda x: x[0], self.la_lista))
+            initials = list(map(lambda x:x[0], self.la_lista))
 
         elif modo == 'RFC':
-            p_vowels = list(filter(lambda a_char: a_char in 'AEIOU', self.apellido_p[1:]))
+            p_vowels = list(filter(lambda a_char:a_char in 'AEIOU', self.apellido_p[1:]))
                         
             if self.un_apellido:
                 initials = self.un_apellido[:2] + self.nombre_base[:2]
@@ -362,7 +355,7 @@ class PersonaFisica:
         return initials
 
 
-def rfc_completo(tipo: str, nombres_ls: list, f_inicio: date) -> str:  
+def rfc_completo(tipo:str, nombres_ls:list, f_inicio:date) -> str:  
     # TIPO: 'fisica' o 'moral'
     # NOMBRES_LS tiene: 
     #   - 3 elementos: apellido_p, apellido_m, nombres_juntos; en persona física.
@@ -384,7 +377,7 @@ def rfc_completo(tipo: str, nombres_ls: list, f_inicio: date) -> str:
 
 
 #%% Componentes secundarios
-def rfc_inicial(tipo: str, nombres_obj: PersonaFisica) -> str:
+def rfc_inicial(tipo:str, nombres_obj:PersonaFisica) -> str:
     # INPUTS como arriba; 
     # -> INICIALES   : cuatro letras
     # -> NOMBRES_STR : nombres concatenados
@@ -400,7 +393,7 @@ def rfc_inicial(tipo: str, nombres_obj: PersonaFisica) -> str:
     return iniciales
 
 
-def homoclave(nombres: str) -> str:
+def homoclave(nombres:str) -> str:
     # En realidad la homoclave consta de dos caracteres, el tercero es el digito verificador. 
     char_posiciones = [CHARS_1.index(c_char) for c_char in list(nombres)] 
     posiciones_str  = ['0'] + [f'{c_pos:02}'  for c_pos  in char_posiciones]
@@ -416,7 +409,7 @@ def homoclave(nombres: str) -> str:
     return (homo_1 + homo_2) 
 
 
-def verificador(pre_id: str, tipo=None) -> str:  
+def verificador(pre_id:str, tipo=None) -> str:  
     # El verificador es el tercero de la homoclave. 
     
     parametros = {
@@ -438,28 +431,7 @@ def verificador(pre_id: str, tipo=None) -> str:
 
 if __name__ == '__main__':
     ## Imports preparation.
-    
-    # import src.utilities.parsers as parsers
-    
-    # ## Setup the parsers.
-    # the_parser = parsers.rfc_parser()
-    # the_args = the_parser.parse_args()
-
-    # el_rfc = rfc_completo('fisica',  
-    #     nombres_ls = [the_args.apellido_p, the_args.apellido_m, the_args.nombres], 
-    #     f_inicio = datetime.strptime(the_args.f_inicio, '%Y-%m-%d'))
-
-    # print(f'\tEl RFC es: {el_rfc}')
-
-
-    # person_dict = {
-    #     # 'person_type': 'physical',
-    #     'names_list' : ['Villamil', 'Pesqueira', 'Diego'], 
-    #     'date_of_birth' : date(1983, 12, 27), 
-    #     'state_of_birth': 'Ciudad de México', 
-    #     'gender' : 'H'
-    # }
-    
+ 
     person_dict = {
         'firstName' : "Alejandra Jimena",
         'maternalLastName': "Ruiz", 
@@ -472,7 +444,8 @@ if __name__ == '__main__':
     # Construc
 
     person_obj = PersonPhysical(**person_dict)
-    el_rfc = person_obj.get_rfc()
-    # el_curp = person_obj.get_curp()
-
-    print(f'\nRFC\t: {el_rfc}\n')
+    # el_rfc = person_obj.get_rfc()
+    # print(f'\nRFC\t:{el_rfc}\n')
+    
+    el_curp = person_obj.get_curp()
+    # print(f'\nCURP\t:{el_curp}\n')

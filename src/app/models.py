@@ -1,12 +1,19 @@
+# pylint: disable=no-name-in-module
+# pylint: disable=too-few-public-methods
 from typing import Optional, ClassVar, Dict, Any
 
 from fastapi.responses import JSONResponse
-from orjson import dumps            # pylint: disable=no-name-in-module
-from pydantic import BaseModel      # pylint: disable=no-name-in-module
+from orjson import dumps 
+from pydantic import BaseModel      
+from toolz import valmap
 
 from src.get_rfc import PersonPhysical
 
-# pylint: disable=too-few-public-methods
+class CustomModel(BaseModel): 
+    @classmethod
+    def from_gen(cls, gen): 
+        return cls(**dict(zip(cls.__fields__, gen)))
+
 
 class RequestValidation(BaseModel): 
     userRFC: str
@@ -43,14 +50,19 @@ class RFCValidationResponse(BaseModel):
         return c_obj
 
 
-class OffensiveResponse(BaseModel): 
+class OffensiveResponse(CustomModel): 
     alias : str
     offense: Optional[str] = None
     offenseType: Optional[str] = None
+
+    def fprint(self):
+        none_str = lambda ss: ss or ""
+        str_dict = valmap(none_str, self.dict())
+        return "{alias:16}{offense:10}{offenseType:12}".format(**str_dict) 
 
 
 class ORJSONResponse(JSONResponse):
     media_type = "application/json"
 
-    def render(self, content: Any) -> bytes:
+    def render(self, content:Any) -> bytes:
         return dumps(content)
