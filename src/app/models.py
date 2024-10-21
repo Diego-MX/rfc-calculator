@@ -55,10 +55,12 @@ class OffensiveResponse(CustomModel):
     offense: Optional[str] = None
     offenseType: Optional[str] = None
 
-    def fprint(self):
+    def fprint(self, f_lengths=None):
+        f_lengths = f_lengths or (16, 10, 12)
         none_str = lambda ss: ss or ""
         str_dict = valmap(none_str, self.dict())
-        return "{alias:16}{offense:10}{offenseType:12}".format(**str_dict) 
+        double_fmt = "{{alias:{0}}}{{offense:{1}}}{{offenseType:{2}}}"
+        return double_fmt.format(*f_lengths).format(**str_dict) 
 
 
 class ORJSONResponse(JSONResponse):

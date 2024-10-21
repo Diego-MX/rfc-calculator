@@ -107,7 +107,3 @@ if __name__ == '__main__':
         none_to_empty = lambda ss: ss or ''
         print(f"{pp:16}: {offensive_alias(pp).fprint()}")
 
-
-
-
-
